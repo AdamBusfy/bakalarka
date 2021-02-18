@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install -y \
     libicu-dev  \
     libonig-dev \
     libxslt1-dev \
+    nodejs \
+    npm \
     acl \
     && echo 'alias sf="php bin/console"' >> ~/.bashrc
 

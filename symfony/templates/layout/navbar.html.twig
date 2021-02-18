@@ -1,0 +1,18 @@
+<nav
+        class="navbar navbar-expand-lg navbar-light bg-light"
+        style="height: 70px;"
+>
+    <a class="navbar-brand" href="#">Property manager</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
+    <ul class="nav navbar-nav navbar-right">
+        {% if app.user %}
+            <li><a class="nav-link" href="{{ path('list') }}">View List</a></li>
+            <li><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>
+        {% else %}
+            <li><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
+            <li>
+                <a class="nav-link" href="{{ path('registration') }}">Register</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
