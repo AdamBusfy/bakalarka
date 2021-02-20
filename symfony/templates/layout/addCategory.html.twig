@@ -1,0 +1,39 @@
+{{ form_start(createCategoryForm) }}
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Create new category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    {{ form_row(createCategoryForm.name, {
+                        attr: {
+                            class: "form-control"
+                        }
+                    }) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(createCategoryForm.parent, {
+                        attr: {
+                            class: "fonrm-control selectpicker w-100",
+                            "data-live-search": "true"
+                        }
+                    }) }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {{ form_row(createCategoryForm._token) }}
+                {{ form_row(createCategoryForm.submitButton) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(createCategoryForm) }}
+

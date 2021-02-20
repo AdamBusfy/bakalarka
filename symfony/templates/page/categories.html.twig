@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block title %}Categories{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-categories') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-categories') }}
+{% endblock %}
+
+{% block body %}
+    {% include('layout/addCategory.html.twig') %}
+    <div class="container">
+        <div class="alert alert-success">Categories</div>
+
+        <a href="#addCategoryModal" data-toggle="modal">Create category</a>
+
+    </div>
+{% endblock %}
