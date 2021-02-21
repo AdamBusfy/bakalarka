@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block title %}Locations{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-locations') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-locations') }}
+{% endblock %}
+
+{% block body %}
+    {% include('layout/modal/addLocation.html.twig') %}
+    <div class="container">
+        <div class="alert alert-success">Locations</div>
+
+        <a href="#addLocationModal" data-toggle="modal">Create location</a>
+
+    </div>
+{% endblock %}

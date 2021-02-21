@@ -10,11 +10,52 @@
 {% endblock %}
 
 {% block body %}
-    {% include('layout/addCategory.html.twig') %}
+    {% include('layout/modal/addCategory.html.twig') %}
     <div class="container">
         <div class="alert alert-success">Categories</div>
 
         <a href="#addCategoryModal" data-toggle="modal">Create category</a>
 
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Path</th>
+                <th scope="col">Settings</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for category in categories %}
+                {% set deleteForm = deleteCategoryForm.createView %}
+
+                <tr>
+                    <th scope="row">{{ category.id }}</th>
+                    <td>{{ category.name }}</td>
+                    <td>{{
+                        category.getAncestors()
+                        |map(
+                            (ancestor, index) =>
+                        index == 0
+                        ? "<strong>#{ancestor.name}</strong>"
+                        : ancestor.name
+                        )
+                        |reverse
+                        |join(' > ')
+                        |raw
+                        }}</td>
+                    <td style="vertical-align: middle">
+                        <button type="button" class="btn btn-primary">Show</button>
+                        <button type="button" class="btn btn-success">Edit</button>
+                        {{ form_start(deleteForm, { attr: { onsubmit: 'return confirm("Are you sure you want to delete this category?");' } }) }}
+                        {{ form_row(deleteForm.id, { attr: { value: category.id } }) }}
+                        {{ form_row(deleteForm.submitButton) }}
+                        {{ form_end(deleteForm) }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
     </div>
 {% endblock %}

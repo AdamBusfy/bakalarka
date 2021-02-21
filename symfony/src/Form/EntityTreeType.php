@@ -53,10 +53,10 @@ class EntityTreeType extends AbstractType {
                 []
             );
 
-            if ( !$choice->getCategories()->isEmpty() )
+            if ( !$choice->getChildren()->isEmpty() )
                 $result = array_merge(
                     $result,
-                    $this->buildTreeChoices( $choice->getCategories() , $level + 1 )
+                    $this->buildTreeChoices( $choice->getChildren() , $level + 1 )
                 );
 
         }

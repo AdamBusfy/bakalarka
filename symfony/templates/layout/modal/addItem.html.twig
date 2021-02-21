@@ -1,0 +1,55 @@
+{{ form_start(createItemForm) }}
+
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addItemModalLabel">Create new item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    {{ form_row(createItemForm.name, {
+                        attr: {
+                            class: "form-control"
+                        }
+                    }) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(createItemForm.parent, {
+                        attr: {
+                            class: "fonrm-control selectpicker w-100",
+                            "data-live-search": "true"
+                        }
+                    }) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(createItemForm.category, {
+                        attr: {
+                            class: "fonrm-control selectpicker w-100",
+                            "data-live-search": "true"
+                        }
+                    }) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(createItemForm.location, {
+                        attr: {
+                            class: "fonrm-control selectpicker w-100",
+                            "data-live-search": "true"
+                        }
+                    }) }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {{ form_row(createItemForm._token) }}
+                {{ form_row(createItemForm.submitButton) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(createItemForm) }}
+

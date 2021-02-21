@@ -25,14 +25,14 @@ class Item
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Item::class, inversedBy="items")
+     * @ORM\ManyToOne(targetEntity=Item::class, inversedBy="children")
      */
     private $parent;
 
     /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="parent")
      */
-    private $items;
+    private $children;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="items")
@@ -47,7 +47,7 @@ class Item
 
     public function __construct()
     {
-        $this->items = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -82,15 +82,15 @@ class Item
     /**
      * @return Collection|self[]
      */
-    public function getItems(): Collection
+    public function getChildren(): Collection
     {
-        return $this->items;
+        return $this->children;
     }
 
     public function addItem(self $item): self
     {
-        if (!$this->items->contains($item)) {
-            $this->items[] = $item;
+        if (!$this->children->contains($item)) {
+            $this->children[] = $item;
             $item->setParent($this);
         }
 
@@ -99,7 +99,7 @@ class Item
 
     public function removeItem(self $item): self
     {
-        if ($this->items->removeElement($item)) {
+        if ($this->children->removeElement($item)) {
             // set the owning side to null (unless already changed)
             if ($item->getParent() === $this) {
                 $item->setParent(null);

@@ -25,14 +25,14 @@ class Location
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Location::class, inversedBy="locations")
+     * @ORM\ManyToOne(targetEntity=Location::class, inversedBy="children")
      */
     private $parent;
 
     /**
      * @ORM\OneToMany(targetEntity=Location::class, mappedBy="parent")
      */
-    private $locations;
+    private $children;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="locations")
@@ -46,7 +46,7 @@ class Location
 
     public function __construct()
     {
-        $this->locations = new ArrayCollection();
+        $this->children = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->items = new ArrayCollection();
     }
@@ -83,15 +83,15 @@ class Location
     /**
      * @return Collection|self[]
      */
-    public function getLocations(): Collection
+    public function getChildren(): Collection
     {
-        return $this->locations;
+        return $this->children;
     }
 
     public function addLocation(self $location): self
     {
-        if (!$this->locations->contains($location)) {
-            $this->locations[] = $location;
+        if (!$this->children->contains($location)) {
+            $this->children[] = $location;
             $location->setParent($this);
         }
 
@@ -100,7 +100,7 @@ class Location
 
     public function removeLocation(self $location): self
     {
-        if ($this->locations->removeElement($location)) {
+        if ($this->children->removeElement($location)) {
             // set the owning side to null (unless already changed)
             if ($location->getParent() === $this) {
                 $location->setParent(null);

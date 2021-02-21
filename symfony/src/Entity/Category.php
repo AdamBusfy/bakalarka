@@ -25,14 +25,14 @@ class Category
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="categories")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="children")
      */
     private $parent;
 
     /**
      * @ORM\OneToMany(targetEntity=Category::class, mappedBy="parent")
      */
-    private $categories;
+    private $children;
 
     /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="category", orphanRemoval=true)
@@ -41,7 +41,7 @@ class Category
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
+        $this->children = new ArrayCollection();
         $this->items = new ArrayCollection();
     }
 
@@ -77,15 +77,15 @@ class Category
     /**
      * @return Collection|self[]
      */
-    public function getCategories(): Collection
+    public function getChildren(): Collection
     {
-        return $this->categories;
+        return $this->children;
     }
 
     public function addCategory(self $category): self
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories[] = $category;
+        if (!$this->children->contains($category)) {
+            $this->children[] = $category;
             $category->setParent($this);
         }
 
@@ -94,7 +94,7 @@ class Category
 
     public function removeCategory(self $category): self
     {
-        if ($this->categories->removeElement($category)) {
+        if ($this->children->removeElement($category)) {
             // set the owning side to null (unless already changed)
             if ($category->getParent() === $this) {
                 $category->setParent(null);
@@ -133,4 +133,34 @@ class Category
 
         return $this;
     }
+
+    /**
+     * @param Category[] $ancestors
+     * @return Category[]
+     */
+    public function getAncestors(array $ancestors = []): array
+    {
+        $ancestors[] = $this;
+
+        if (!empty($this->getParent())) {
+            $ancestors = array_merge($ancestors, $this->getParent()->getAncestors());
+        }
+
+        return $ancestors;
+    }
+
+//    public function getPath(string $delimiter = ' > '): string
+//    {
+//        $ancestors = $this->getAncestors();
+//
+//        $names = array_map(
+//            function (Category $category, int $index) {
+//                return $category->getName();
+//            },
+//            $ancestors,
+//            array_keys($ancestors)
+//        );
+//
+//        return implode($delimiter, $names);
+//    }
 }
