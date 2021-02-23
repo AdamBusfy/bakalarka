@@ -1,3 +1,2 @@
 import '../bootstrap.js';
-
-console.log("CATEGORIES");
+import $ from 'jquery';

@@ -15,16 +15,10 @@ class DeleteForm extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('submitButton', SubmitType::class, [
-                'label'=>'Delete',
-                'attr'=> ['class' =>'btn btn-danger btn-sm ', 'style=> display:inline-block'],
+                'label' => '<i class="fa fa-trash"></i>',
+                'label_html' => true,
+                'attr'=> ['class' =>'btn btn-danger', 'style=> display:inline-block'],
             ]);
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-//            'data_class' => Gallery::class,
-        ]);
     }
 
 }
