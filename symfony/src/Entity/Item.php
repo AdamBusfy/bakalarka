@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
@@ -37,8 +39,14 @@ class Item
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="items")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotNull(message="Category cannot be empty")
      */
     private $category;
+
+    /**
+     * @ORM\Column(name="date_create", type="datetime", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private $date_create;
 
     /**
      * @ORM\ManyToOne(targetEntity=Location::class, inversedBy="items")
@@ -47,7 +55,24 @@ class Item
 
     public function __construct()
     {
+        $this->date_create = new DateTime();
         $this->children = new ArrayCollection();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateCreate(): DateTime
+    {
+        return $this->date_create;
+    }
+
+    /**
+     * @param DateTime $date_create
+     */
+    public function setDateCreate(DateTime $date_create): void
+    {
+        $this->date_create = $date_create;
     }
 
     public function getId(): ?int
@@ -131,5 +156,20 @@ class Item
         $this->location = $location;
 
         return $this;
+    }
+
+    /**
+     * @param Item[] $ancestors
+     * @return Item[]
+     */
+    public function getAncestors(array $ancestors = []): array
+    {
+        $ancestors[] = $this;
+
+        if (!empty($this->getParent())) {
+            $ancestors = array_merge($ancestors, $this->getParent()->getAncestors());
+        }
+
+        return $ancestors;
     }
 }

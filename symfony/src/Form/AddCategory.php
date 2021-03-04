@@ -22,8 +22,9 @@ class AddCategory extends AbstractType
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',
-                'attr'=> ['class' =>'btn btn-primary']
+                'attr'=> ['class' =>'btn btn-success btn-xs']
             ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver)

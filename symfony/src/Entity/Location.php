@@ -166,4 +166,19 @@ class Location
 
         return $this;
     }
+
+    /**
+     * @param Location[] $ancestors
+     * @return Location[]
+     */
+    public function getAncestors(array $ancestors = []): array
+    {
+        $ancestors[] = $this;
+
+        if (!empty($this->getParent())) {
+            $ancestors = array_merge($ancestors, $this->getParent()->getAncestors());
+        }
+
+        return $ancestors;
+    }
 }

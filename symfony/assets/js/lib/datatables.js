@@ -18,7 +18,8 @@ import jQuery from 'jquery';
     $.fn.initDataTables = function(config, options) {
 
         //Update default used url, so it reflects the current location (useful on single side apps)
-        $.fn.initDataTables.defaults.url = window.location.origin + window.location.pathname;
+        // $.fn.initDataTables.defaults.url = window.location.origin + window.location.pathname;
+        $.fn.initDataTables.defaults.url = window.location.href;
 
         var root = this,
             config = $.extend({}, $.fn.initDataTables.defaults, config),

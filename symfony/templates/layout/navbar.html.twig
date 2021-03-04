@@ -1,24 +1,54 @@
-<nav
-        class="navbar navbar-expand-lg navbar-light bg-light"
-        style="height: 70px;"
->
-    <a class="navbar-brand" href="{{ path('homepage') }}">Property manager</a>
-    {% if app.user %}
-     <span class="navbar-text" style="text-decoration:none">{{ app.user.username }}</span>
-    {% endif %}
-    <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
-    <ul class="nav navbar-nav navbar-right">
+{#<nav#}
+{#        class="navbar navbar-expand-lg navbar-light bg-light"#}
+{#        style="height: 70px;"#}
+{#>#}
+{#    <a class="navbar-brand" href="{{ path('homepage') }}">Property manager</a>#}
+{#    {% if app.user %}#}
+{#     <span class="navbar-text" style="text-decoration:none">{{ app.user.username }}</span>#}
+{#    {% endif %}#}
+
+{#    <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>#}
+{#    <ul class="nav navbar-nav navbar-right">#}
+{#        {% if app.user %}#}
+{#            <li><a class="nav-link" href="{{ path('users') }}">Users</a></li>#}
+{#            <li><a class="nav-link" href="{{ path('categories') }}">Categories</a></li>#}
+{#            <li><a class="nav-link" href="{{ path('locations') }}">Locations</a></li>#}
+{#            <li><a class="nav-link" href="{{ path('items') }}">Items</a></li>#}
+{#            <li><a class="nav-link" href="{{ path('homepage') }}">Home</a></li>#}
+{#            <li><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>#}
+{#        {% else %}#}
+{#            <li><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>#}
+{#            <li>#}
+{#                <a class="nav-link" href="{{ path('registration') }}">Register</a>#}
+{#            </li>#}
+{#        {% endif %}#}
+{#    </ul>#}
+{#</nav>#}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="height: 70px">
+        <a class="navbar-brand" href="{{ path('homepage') }}">Property manager</a>
         {% if app.user %}
-            <li><a class="nav-link" href="{{ path('categories') }}">Categories</a></li>
-            <li><a class="nav-link" href="{{ path('locations') }}">Locations</a></li>
-            <li><a class="nav-link" href="{{ path('items') }}">Items</a></li>
-            <li><a class="nav-link" href="{{ path('homepage') }}">Home</a></li>
-            <li><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>
-        {% else %}
-            <li><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
-            <li>
-                <a class="nav-link" href="{{ path('registration') }}">Register</a>
-            </li>
+            <span class="navbar-text" style="text-decoration:none; margin-right: auto">{{ app.user.username }}</span>
         {% endif %}
-    </ul>
-</nav>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="nav navbar-nav navbar-right" style="margin-left: auto">
+                {% if app.user %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('users') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('categories') }}">Categories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('locations') }}">Locations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('items') }}">Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('homepage') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('registration') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+
+
+

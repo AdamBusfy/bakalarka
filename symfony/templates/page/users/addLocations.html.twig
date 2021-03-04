@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %}Add Locations to User{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-addUserLocations') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-addUserLocations') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid" style="width: 95%">
+        <div class="row">
+            <div class="col">
+                <h2 class="text-secondary mt-3 mb-3">Unassigned locations</h2>
+                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableAdd) }}'></div>
+            </div>
+            <div class="col">
+                <h2 class="text-secondary mt-3 mb-3">Assigned locations</h2>
+                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableRemove) }}'></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

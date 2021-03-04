@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add location{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-addLocation') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-addLocation') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="width: 75%">
+        {{ form_start(addLocationForm) }}
+        <div class="form-group">
+            {{ form_row(addLocationForm.name, {
+                attr: {
+                    class: "form-control"
+                }
+            }) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(addLocationForm.parent, {
+                attr: {
+                    class: "form-control selectpicker w-100",
+                    "data-live-search": "true"
+                }
+            }) }}
+        </div>
+        {{ form_end(addLocationForm) }}
+    </div>
+
+{% endblock %}

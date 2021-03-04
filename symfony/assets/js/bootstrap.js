@@ -12,11 +12,27 @@ import 'datatables.net-select-bs4/css/select.bootstrap4.css';
 import './lib/datatables'
 import '../css/bootstrap.scss';
 import 'font-awesome/css/font-awesome.css';
+import 'bootstrap-datepicker'
+// import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.css'
+import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'
+// import 'bootstrap-datepicker/js/bootstrap-datepicker'
+
+
+$('.datepicker').datepicker();
+$('.datepicker').on('changeDate', function() {
+    $('#my_hidden_input').val(
+        $('#datepicker').datepicker('getFormattedDate')
+    );
+});
+
+$('.input-daterange input').each(function() {
+    $(this).datepicker('clearDates');
+});
 
 $("[data-data-table]").each((_index, table) => {
     const options = JSON.parse(table.dataset.options);
     $(table).initDataTables(options, {
-        searching: true,
+        searching: false,
         // select: {
         //     style: 'multi'
         // },

@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %}Categories{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-categories') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-categories') }}
+{% endblock %}
+{% block body %}
+    {#    {% include('layout/modal/show.html.twig') %}#}
+    <div class="container">
+{#        <div class="alert alert-success">Categories</div>#}
+        <div class="mt-3">
+            <a href="{{ path('add_category') }}" type="button" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> Add category </a>
+
+{#            <a  href="{{ path('add_category') }}">Create category</a>#}
+        </div>
+
+        <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable) }}'></div>
+
+
+    </div>
+{% endblock %}

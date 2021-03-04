@@ -3,13 +3,15 @@
 namespace App\Form;
 
 use App\Entity\Category;
+use App\Entity\Item;
+use App\Entity\Location;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EditCategory extends AbstractType
+class EditItem extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -18,9 +20,19 @@ class EditCategory extends AbstractType
                 'required' => false,
             ])
             ->add('parent', EntityTreeType::class, [
+                'class' => Item::class,
+                'choice_label' => 'name',
+                'required' => false
+            ])
+            ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'required' => false
+            ])
+            ->add('location', EntityTreeType::class, [
+                'class' => Location::class,
+                'choice_label' => 'name',
+                'required' => false,
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Edit',
@@ -31,7 +43,7 @@ class EditCategory extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Category::class,
+            'data_class' => Item::class,
         ]);
     }
 }

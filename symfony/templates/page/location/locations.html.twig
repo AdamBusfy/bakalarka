@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Locations{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-locations') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-locations') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mt-3">
+            <a href="{{ path('add_location') }}" type="button" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> Add location </a>
+{#            <a  href="{{ path('add_location') }}">Create location</a>#}
+        </div>
+
+        <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable) }}'></div>
+
+    </div>
+{% endblock %}

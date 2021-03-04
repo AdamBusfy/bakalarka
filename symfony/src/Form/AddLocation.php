@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Category;
 use App\Entity\Location;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -23,7 +22,7 @@ class AddLocation extends AbstractType
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',
-                'attr'=> ['class' =>'btn btn-primary']
+                'attr'=> ['class' =>'btn btn-success btn-xs']
             ]);
     }
 

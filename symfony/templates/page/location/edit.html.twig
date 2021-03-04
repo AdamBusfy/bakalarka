@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit location{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-editLocation') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-editLocation') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="width: 75%">
+        {{ form_start(editLocationForm) }}
+        <div class="form-group">
+            {{ form_row(editLocationForm.name, {
+                attr: {
+                    class: "form-control"
+                }
+            }) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(editLocationForm.parent, {
+                attr: {
+                    class: "form-control selectpicker w-100",
+                    "data-live-search": "true"
+                }
+            }) }}
+        </div>
+        {{ form_end(editLocationForm) }}
+    </div>
+{% endblock %}

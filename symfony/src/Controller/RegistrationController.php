@@ -22,6 +22,10 @@ class RegistrationController extends AbstractController
 
     /**
      * @Route("/registration", name="registration")
+     * @param Request $request
+     * @param GuardAuthenticatorHandler $guardHandler
+     * @param LoginFormAuthenticator $authenticator
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function index(Request $request, GuardAuthenticatorHandler $guardHandler, LoginFormAuthenticator $authenticator)
     {
@@ -37,9 +41,6 @@ class RegistrationController extends AbstractController
 
             // Set their role
             $user->setRoles(['ROLE_USER']);
-
-
-
 
             // Save
             $em = $this->getDoctrine()->getManager();
