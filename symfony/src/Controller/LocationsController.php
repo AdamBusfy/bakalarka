@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Item;
 use App\Entity\Location;
 use App\Form\AddLocation;
+use App\Form\Location\Filter;
 use App\Form\DeleteForm;
 use App\Form\EditLocation;
 use Doctrine\ORM\QueryBuilder;
+use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
@@ -43,6 +45,9 @@ class LocationsController extends AbstractController
             }
         }
 
+        $filterForm = $this->createForm(Filter::class, null, ['csrf_protection' => false]);
+        $filterForm->handleRequest($request);
+
         $table = $dataTableFactory->create()
             ->add('id', TextColumn::class, [
                 'propertyPath' => 'id',
@@ -60,7 +65,7 @@ class LocationsController extends AbstractController
                             function (Location $ancestor) {
                                 return sprintf(
 //                                    '<a href="../../show/location/%s"> %s</a>'
-                                    '<a> %s</a>'
+                                    '<a class="text-secondary" style="text-decoration: none" > %s</a>'
                                     ,
 //                                    $ancestor->getId(),
                                     $ancestor->getName()
@@ -72,9 +77,9 @@ class LocationsController extends AbstractController
 
                     for ($i = 0; $i < count($links); $i++) {
                         if ($i === count($links) - 1) {
-                            $links[$i] = '<a class="text-dark" href="#">' . $links[$i] . '</a>';
+                            $links[$i] = '<a class="text-secondary">' . $links[$i] . '</a>';
                         } else {
-                            $links[$i] = '<a class="text-secondary" href="#">' . $links[$i] . '</a>';
+                            $links[$i] = '<a class="text-secondary">' . $links[$i] . '</a>';
                         }
                     }
 
@@ -96,6 +101,23 @@ class LocationsController extends AbstractController
             ])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Location::class,
+                'criteria' => [
+                    function (QueryBuilder $builder) {
+                        $name = $_GET['filter']['name'] ?? null;
+
+                        if (!empty(array_filter([$name]))) {
+                            if (!empty($name)) {
+                                $builder
+                                    ->andWhere('location.name LIKE :name') // TODO ???
+                                    ->setParameter(
+                                        'name',
+                                        "%" . $name . "%"
+                                    );
+                            }
+                        }
+                    },
+                    new SearchCriteriaProvider()
+                ]
             ])
             ->handleRequest($request);
 
@@ -104,10 +126,10 @@ class LocationsController extends AbstractController
         }
 
         return $this->render('page/location/locations.html.twig', [
-            'datatable' => $table
+            'datatable' => $table,
+            'filterForm' => $filterForm->createView()
         ]);
     }
-
 
     /**
      * @Route("/add/location", name="add_location")
@@ -131,132 +153,6 @@ class LocationsController extends AbstractController
 
         return $this->render('page/location/add.html.twig', [
             'addLocationForm' => $addLocationForm->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/show/location/{id}", name="show_location", requirements={"id"="\d+"})
-     * @param Request $request
-     * @param int $id
-     * @param DataTableFactory $dataTableFactory
-     * @return Response
-     */
-    public function show(Request $request, int $id, DataTableFactory $dataTableFactory): Response
-    {
-        $locationRepository = $this->getDoctrine()
-            ->getRepository(Location::class);
-        $location = $locationRepository->find($id);
-
-        $table = $dataTableFactory->create()
-            ->add('id', TextColumn::class, [
-                'propertyPath' => 'id',
-                'label' => 'ID',
-                'globalSearchable' => false
-            ])
-            ->add('name', TextColumn::class, [
-                'label' => 'Name'
-            ])
-            ->add('location', TextColumn::class, [
-                'label' => 'Location',
-                'render' => function($value, Item $context) {
-                    if (empty($context->getLocation())) {
-                        return sprintf(
-                            '<a class="text-secondary" style="pointer-events: none;"> %s</a>'
-                            ,
-                            "empty location"
-                        );
-                    }
-                    return sprintf(
-                        '<a href="../../show/location/%s"> %s</a>'
-                        ,
-                        $context->getLocation()->getId(),
-                        $context->getLocation()->getName()
-                    );
-                }])
-            ->add('category', TextColumn::class, [
-                'label' => 'Category',
-                'render' => function($value, Item $context) {
-                    if (empty($context->getCategory())) {
-                        return sprintf(
-                            '<a class="text-secondary"> %s</a>'
-                            ,
-                            "empty category"
-                        );
-                    }
-                    return sprintf(
-                        '<a href="../../show/category/%s"> %s</a>'
-                        ,
-                        $context->getCategory()->getId(),
-                        $context->getCategory()->getName()
-                    );
-                }])
-            ->add('ancestors', TextColumn::class, [
-                'label' => 'Path',
-                'render' => function($value, Item $context) {
-                    $links = array_reverse(
-                        array_map(
-                            function (Item $ancestor) {
-                                return sprintf(
-                                    '<a href="../../show/item/%s"> %s</a>'
-                                    ,
-                                    $ancestor->getId(),
-                                    $ancestor->getName()
-                                );
-                            },
-                            $context->getAncestors()
-                        )
-                    );
-
-                    for ($i = 0; $i < count($links); $i++) {
-                        if ($i === count($links) - 1) {
-                            $links[$i] = '<a class="text-dark" href="#">' . $links[$i] . '</a>';
-                        } else {
-                            $links[$i] = '<a class="text-secondary" href="#">' . $links[$i] . '</a>';
-                        }
-                    }
-
-                    return implode(" > ", $links);
-                }
-            ])
-            ->add('date_create', DateTimeColumn::class, [
-                'format' => 'm-d-Y',
-                'label' => "Timestamp"
-            ])
-            ->add('actions', TextColumn::class, [
-                'label' => 'Actions',
-                'propertyPath' => 'id',
-                'render' => function($value, $context) {
-                    $data = '<div class="text-center">';
-                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_item', ['id' => $value])]);
-//                    $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_item', ['id' => $value])]);
-//                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['confirm' => true, 'id' => $value, 'form' => $deleteItemForm->createView()]);
-                    $data .= "</div>";
-
-                    return $data;
-                }
-            ])
-            ->createAdapter(ORMAdapter::class, [
-                'entity' => Item::class,
-                'query' => function (QueryBuilder $builder) use ($id) {
-                    $builder
-                        ->select('i')
-                        ->from(Item::class, 'i')
-                        ->where('i.location = :lid')
-                        ->setParameter('lid', $id)
-                    ;
-                },
-            ])
-            ->handleRequest($request);
-
-        if ($table->isCallback()) {
-            return $table->getResponse();
-        }
-
-
-
-        return $this->render('page/location/show.html.twig', [
-            'location' => $location,
-            'datatable' => $table
         ]);
     }
 

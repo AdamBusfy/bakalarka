@@ -9,6 +9,7 @@ use App\Form\AddItem;
 use App\Form\DeleteForm;
 use App\Form\EditItem;
 use App\Form\Item\Filter;
+use DateTimeImmutable;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
@@ -47,6 +48,8 @@ class ItemsController extends AbstractController
             }
         }
 
+        $usersLocations = $this->getUser()->getLocations()->toArray();
+
         $filterForm = $this->createForm(Filter::class, null, ['csrf_protection' => false]);
         $filterForm->handleRequest($request);
 
@@ -61,7 +64,7 @@ class ItemsController extends AbstractController
             ])
             ->add('location', TextColumn::class, [
                 'label' => 'Location',
-                'render' => function($value, Item $context) {
+                'render' => function ($value, Item $context) {
                     if (empty($context->getLocation())) {
                         return sprintf(
                             '<a class="text-secondary" style="pointer-events: none;"> %s</a>'
@@ -76,10 +79,10 @@ class ItemsController extends AbstractController
 //                        $context->getLocation()->getId(),
                         $context->getLocation()->getName()
                     );
-            }])
+                }])
             ->add('category', TextColumn::class, [
                 'label' => 'Category',
-                'render' => function($value, Item $context) {
+                'render' => function ($value, Item $context) {
                     if (empty($context->getCategory())) {
                         return sprintf(
                             '<a class="text-secondary"> %s</a>'
@@ -97,12 +100,12 @@ class ItemsController extends AbstractController
                 }])
             ->add('ancestors', TextColumn::class, [
                 'label' => 'Path',
-                'render' => function($value, Item $context) {
+                'render' => function ($value, Item $context) {
                     $links = array_reverse(
                         array_map(
                             function (Item $ancestor) {
                                 return sprintf(
-                                    '<a href="../../show/item/%s"> %s</a>'
+                                    '<a class="text-info" style="text-decoration: none" href="../../show/item/%s"> %s</a>'
                                     ,
                                     $ancestor->getId(),
                                     $ancestor->getName()
@@ -124,7 +127,7 @@ class ItemsController extends AbstractController
                 }
             ])
             ->add('date_create', DateTimeColumn::class, [
-                'format' => 'm-d-Y',
+                'format' => 'd/m/Y',
                 'label' => "Timestamp",
                 'globalSearchable' => false
 
@@ -132,7 +135,7 @@ class ItemsController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use ($deleteItemForm) {
+                'render' => function ($value, $context) use ($deleteItemForm) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_item', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_item', ['id' => $value])]);
@@ -145,21 +148,26 @@ class ItemsController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Item::class,
                 'criteria' => [
-                    function (QueryBuilder $builder) {
+                    function (QueryBuilder $builder) use ($usersLocations) {
                         $name = $_GET['filter']['name'] ?? null;
                         $category = $_GET['filter']['category'] ?? null;
                         $location = $_GET['filter']['location'] ?? null;
+                        $startDateTime = $_GET['filter']['startDateTime'] ?? null;
+                        $endDateTime = $_GET['filter']['endDateTime'] ?? null;
 
-//                        $builder
-//                            ->select('i, c, l')
-//                            ->from(Item::class, 'i')
-//                            ->leftJoin(Location::class, 'l', Join::WITH, 'i.location = l')
-//                            ->join(Category::class, 'c', Join::WITH, 'i.category = c');
+                        $usersLocationsIds = array_map(function (Location $location) {
+                            return $location->getId();
+                        }, $usersLocations);
 
-                        if (!empty(array_filter([$name, $category, $location]))) {
+                        if (!in_array('ROLE_USER', $this->getUser()->getRoles())) {
+                            $builder
+                                ->andWhere($builder->expr()->in('item.location', $usersLocationsIds));  // TODO ???
+                        }
+
+                        if (!empty(array_filter([$name, $category, $location, $startDateTime, $endDateTime]))) {
                             if (!empty($name)) {
                                 $builder
-                                    ->andWhere('item.name LIKE :name') // TODO ???
+                                    ->andWhere('item.name LIKE :name')
                                     ->setParameter(
                                         'name',
                                         "%" . $name . "%"
@@ -168,7 +176,7 @@ class ItemsController extends AbstractController
 
                             if (!empty($category)) {
                                 $builder
-                                    ->andWhere('item.category = :category') // TODO ???
+                                    ->andWhere('item.category = :category')
                                     ->setParameter(
                                         'category',
                                         $category
@@ -177,10 +185,30 @@ class ItemsController extends AbstractController
 
                             if (!empty($location)) {
                                 $builder
-                                    ->andWhere('item.location = :location') // TODO ???
+                                    ->andWhere('item.location = :location')
                                     ->setParameter(
                                         'location',
                                         $location
+                                    );
+                            }
+
+                            if (!empty($startDateTime)) {
+                                $startDateTimeFormatted = DateTimeImmutable::createFromFormat('d/m/y', $startDateTime);
+                                $builder
+                                    ->andWhere('item.date_create >= :startDateTime')
+                                    ->setParameter(
+                                        'startDateTime',
+                                        $startDateTimeFormatted->format('Y-m-d')
+                                    );
+                            }
+
+                            if (!empty($endDateTime)) {
+                                $endDateTimeFormatted = DateTimeImmutable::createFromFormat('d/m/y', $endDateTime);
+                                $builder
+                                    ->andWhere('item.date_create <= :endDateTime')
+                                    ->setParameter(
+                                        'endDateTime',
+                                        $endDateTimeFormatted->format('Y-m-d')
                                     );
                             }
                         }
@@ -215,7 +243,7 @@ class ItemsController extends AbstractController
         if ($addItemForm->isSubmitted() && $addItemForm->isValid()) {
 //            $item->setName($addItemForm->get('name')->getData());
 
-            if (!empty($addItemForm->get('parent')->getData())){
+            if (!empty($addItemForm->get('parent')->getData())) {
                 $item->setLocation($addItemForm->get('parent')->getData()->getLocation());
             }
 
@@ -279,7 +307,7 @@ class ItemsController extends AbstractController
                 $editItem->setParent($editItemForm->get('parent')->getData());
 
                 $locationToSet = $editItem->getLocation();
-                if (!empty($editItemForm->get('parent')->getData())){
+                if (!empty($editItemForm->get('parent')->getData())) {
                     $locationToSet = $editItemForm->get('parent')->getData()->getLocation();
                 }
 

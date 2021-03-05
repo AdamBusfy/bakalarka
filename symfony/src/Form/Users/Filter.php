@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Item;
+namespace App\Form\Users;
 
 use App\Entity\Category;
 use App\Entity\Location;
@@ -20,14 +20,7 @@ class Filter extends AbstractType
             ->add('name', TextType::class, [
                 'required' => false
             ])
-            ->add('location', EntityTreeType::class, [
-                'class' => Location::class,
-                'choice_label' => 'name',
-                'required' => false
-            ])
-            ->add('category', EntityTreeType::class, [
-                'class' => Category::class,
-                'choice_label' => 'name',
+            ->add('email', TextType::class, [
                 'required' => false
             ])
             ->add('startDateTime', TextType::class, [
@@ -53,6 +46,5 @@ class Filter extends AbstractType
                 'required' => false,
             ])
             ->add('submit', SubmitType::class);
-
     }
 }

@@ -7,9 +7,12 @@ use App\Entity\Location;
 use App\Entity\User;
 use App\Form\AddUserLocation;
 use App\Form\DeleteForm;
+use App\Form\Users\Filter;
 use App\Form\RemoveUserLocation;
+use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\FetchJoinORMAdapter;
+use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
@@ -47,6 +50,9 @@ class UsersController extends AbstractController
             }
         }
 
+        $filterForm = $this->createForm(Filter::class, null, ['csrf_protection' => false]);
+        $filterForm->handleRequest($request);
+
         $table = $dataTableFactory->create()
             ->add('id', TextColumn::class, [
                 'propertyPath' => 'id',
@@ -60,7 +66,7 @@ class UsersController extends AbstractController
                 'label' => 'E-mail'
             ])
             ->add('date_create', DateTimeColumn::class, [
-                'format' => 'm-d-Y',
+                'format' => 'd/m/Y',
                 'label' => "Timestamp",
                 'globalSearchable' => false
 
@@ -69,7 +75,7 @@ class UsersController extends AbstractController
             ('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use ($deleteUserForm) {
+                'render' => function ($value, $context) use ($deleteUserForm) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/attach.html.twig', ['url' => $this->generateUrl('user_add_locations', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value, 'form' => $deleteUserForm->createView()]);
@@ -79,6 +85,55 @@ class UsersController extends AbstractController
             ])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => User::class,
+                'criteria' => [
+                    function (QueryBuilder $builder) {
+                        $name = $_GET['filter']['name'] ?? null;
+                        $email = $_GET['filter']['email'] ?? null;
+                        $startDateTime = $_GET['filter']['startDateTime'] ?? null;
+                        $endDateTime = $_GET['filter']['endDateTime'] ?? null;
+
+                        if (!empty(array_filter([$name, $startDateTime, $endDateTime, $email]))) {
+                            if (!empty($name)) {
+                                $builder
+                                    ->andWhere('user.name LIKE :name') // TODO ???
+                                    ->setParameter(
+                                        'name',
+                                        "%" . $name . "%"
+                                    );
+                            }
+
+                            if (!empty($email)) {
+                                $builder
+                                    ->andWhere('user.email LIKE :email') // TODO ???
+                                    ->setParameter(
+                                        'email',
+                                        "%" . $email . "%"
+                                    );
+                            }
+
+                            if (!empty($startDateTime)) {
+                                $startDateTimeFormatted = DateTimeImmutable::createFromFormat('d/m/y', $startDateTime);
+                                $builder
+                                    ->andWhere('user.date_create >= :startDateTime')
+                                    ->setParameter(
+                                        'startDateTime',
+                                        $startDateTimeFormatted->format('Y-m-d')
+                                    );
+                            }
+
+                            if (!empty($endDateTime)) {
+                                $endDateTimeFormatted = DateTimeImmutable::createFromFormat('d/m/y', $endDateTime);
+                                $builder
+                                    ->andWhere('user.date_create <= :endDateTime')
+                                    ->setParameter(
+                                        'endDateTime',
+                                        $endDateTimeFormatted->format('Y-m-d')
+                                    );
+                            }
+                        }
+                    },
+                    new SearchCriteriaProvider()
+                ]
             ])
             ->handleRequest($request);
 
@@ -87,7 +142,8 @@ class UsersController extends AbstractController
         }
 
         return $this->render('page/users/users.html.twig', [
-            'datatable' => $table
+            'datatable' => $table,
+            'filterForm' => $filterForm->createView()
         ]);
     }
 
@@ -130,7 +186,7 @@ class UsersController extends AbstractController
             ])
             ->add('ancestors', TextColumn::class, [
                 'label' => 'Path',
-                'render' => function($value,Location $context) {
+                'render' => function ($value, Location $context) {
                     $links = array_reverse(
                         array_map(
                             function (Location $ancestor) {
@@ -157,7 +213,7 @@ class UsersController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use($addLocationForm)  {
+                'render' => function ($value, $context) use ($addLocationForm) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/add.html.twig', ['id' => $value, 'form' => $addLocationForm->createView()]);
                     $data .= "</div>";
@@ -182,7 +238,7 @@ class UsersController extends AbstractController
                             ->getArrayResult();
 
                         $assignedLocationIds = array_map(function (array $record) {
-                            return (int) $record['id'];
+                            return (int)$record['id'];
                         }, $assignedLocationIds);
 
                         $builder->select('l')
@@ -190,10 +246,9 @@ class UsersController extends AbstractController
 
                         if (!empty($assignedLocationIds)) {
                             $builder
-                                ->where($builder->expr()->notIn('l.id',  $assignedLocationIds));
+                                ->where($builder->expr()->notIn('l.id', $assignedLocationIds));
                         }
                     },
-
                 ],
             ])
             ->handleRequest($request);
@@ -236,7 +291,7 @@ class UsersController extends AbstractController
             ])
             ->add('ancestors', TextColumn::class, [
                 'label' => 'Path',
-                'render' => function($value,Location $context) {
+                'render' => function ($value, Location $context) {
                     $links = array_reverse(
                         array_map(
                             function (Location $ancestor) {
@@ -263,7 +318,7 @@ class UsersController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use($removeLocationForm)  {
+                'render' => function ($value, $context) use ($removeLocationForm) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value, 'form' => $removeLocationForm->createView()]);
                     $data .= "</div>";
@@ -297,8 +352,8 @@ class UsersController extends AbstractController
     }
 
 
-
-    private function addLocations(Location $location, User $user) {
+    private function addLocations(Location $location, User $user)
+    {
 
         foreach ($location->getChildren() as $child) {
             $this->addLocations($child, $user);
@@ -311,7 +366,8 @@ class UsersController extends AbstractController
         $entityManager->flush();
     }
 
-    private function removeLocations(Location $location, User $user) {
+    private function removeLocations(Location $location, User $user)
+    {
 
         foreach ($location->getChildren() as $child) {
             $this->removeLocations($child, $user);

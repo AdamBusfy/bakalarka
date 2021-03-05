@@ -11,12 +11,50 @@
 
 {% block body %}
     <div class="container">
-        <div class="mt-3">
-            <a href="{{ path('add_location') }}" type="button" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> Add location </a>
-{#            <a  href="{{ path('add_location') }}">Create location</a>#}
+        <div class="row">
+            <div class="col">
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        {{ form_start(filterForm) }}
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {{ form_row(filterForm.name, {
+                                        attr: {
+                                            class: "selectpicker form-control"
+                                        }
+                                    }) }}
+                                </div>
+                            </div>
+                            <div class="col-3">
+                            </div>
+                            <div class="col-3">
+                            </div>
+                            <div class="col-3 justify-content-center align-self-center">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    {{ form_row(filterForm.submit, {
+                                        label: "###ICON### apply filter",
+                                        attr: {
+                                            class: "form-control btn btn-outline-secondary btn-xs"
+                                        }
+                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_end(filterForm) }}
+                    </div>
+                </div>
+
+                <div class="mt-3 mb-4">
+                    <a href="{{ path('add_location') }}" type="button" class="btn btn-success btn-xs"><span
+                                class="fa fa-plus"></span> Add location </a>
+                </div>
+
+                <div data-data-table data-options='{{ datatable_settings(datatable) }}'></div>
+            </div>
         </div>
-
-        <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable) }}'></div>
-
+    </div>
     </div>
 {% endblock %}
