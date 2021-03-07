@@ -25,12 +25,12 @@ class AddItem extends AbstractType
             ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'required' => true
+                'required' => true,
             ])
             ->add('location', EntityTreeType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',
-                'required' => false
+                'required' => false,
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',

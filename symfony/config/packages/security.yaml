@@ -42,3 +42,7 @@ security:
                 target: /
     access_control:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+    role_hierarchy:
+        ROLE_USER: ROLE_USER
+        ROLE_ADMIN: [ ROLE_ADMIN, ROLE_USER]

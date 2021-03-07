@@ -1,0 +1,30 @@
+{{ form_start(addItemToLocationForm) }}
+<div class="modal fade" id="add-item-to-location-modal" tabindex="-1" role="dialog" aria-labelledby="addItemToLocationFormLabel"
+     aria-hidden="true" style="padding-top: 10%;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addItemToLocationFormLabel">Assign item to location</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ form_row(addItemToLocationForm.location,  {
+                    attr: {
+                        class: "selectpicker form-control",
+                        "data-live-search": "true"
+                    }
+                }) }}
+            </div>
+            <div class="modal-footer">
+
+                {{ form_row(addItemToLocationForm.id) }}
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {{ form_row(addItemToLocationForm.submitButton) }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(addItemToLocationForm) }}

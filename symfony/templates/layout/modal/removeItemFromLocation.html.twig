@@ -1,0 +1,22 @@
+{{ form_start(removeItemFromLocationForm) }}
+<div class="modal fade" id="remove-item-from-location-modal" tabindex="-1" role="dialog" aria-labelledby="removeItemFromLocationFormLabel"
+     aria-hidden="true" style="padding-top: 10%;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeItemFromLocationFormLabel">Remove item from this location?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+
+                {{ form_row(removeItemFromLocationForm.id) }}
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {{ form_row(removeItemFromLocationForm.submitButton) }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(removeItemFromLocationForm) }}

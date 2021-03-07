@@ -8,12 +8,13 @@ use App\Entity\Location;
 use App\Entity\User;
 use App\Repository\LocationRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EditItem extends AbstractType
+class AddItemToLocation extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -23,18 +24,8 @@ class EditItem extends AbstractType
         $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
 
         $builder
-            ->add('name', TextType::class, [
-                'required' => false,
-            ])
-            ->add('parent', EntityTreeType::class, [
-                'class' => Item::class,
-                'choice_label' => 'name',
-                'required' => false
-            ])
-            ->add('category', EntityTreeType::class, [
-                'class' => Category::class,
-                'choice_label' => 'name',
-                'required' => false
+            ->add('id', HiddenType::class, [
+                'mapped' => false
             ])
             ->add('location', EntityTreeType::class, [
                 'class' => Location::class,
@@ -56,7 +47,7 @@ class EditItem extends AbstractType
                 }
             ])
             ->add('submitButton', SubmitType::class, [
-                'label'=>'Edit',
+                'label'=>'Assign',
                 'attr'=> ['class' =>'btn btn-primary']
             ]);
     }
@@ -64,9 +55,9 @@ class EditItem extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Item::class,
             'user' => null,
         ]);
+
         $resolver->setAllowedTypes('user', User::class);
 
     }

@@ -11,9 +11,11 @@
 
 {% block body %}
     <div class="container">
+        {{ include('layout/modal/delete.html.twig') }}
         <div class="row">
             <div class="col">
-                <div class="card mt-3">
+                <h2 class="text-secondary mb-3">Registered users</h2>
+                <div class="card mb-5">
                     <div class="card-body">
                         {{ form_start(filterForm) }}
                         <div class="row">

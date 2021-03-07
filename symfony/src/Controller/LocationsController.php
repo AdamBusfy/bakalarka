@@ -93,7 +93,7 @@ class LocationsController extends AbstractController
                     $data = '<div class="text-center">';
 //                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_location', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_location', ['id' => $value])]);
-                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['confirm' => true, 'id' => $value, 'form' => $deleteLocationForm->createView()]);
+                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value]);
                     $data .= "</div>";
 
                     return $data;
@@ -127,7 +127,8 @@ class LocationsController extends AbstractController
 
         return $this->render('page/location/locations.html.twig', [
             'datatable' => $table,
-            'filterForm' => $filterForm->createView()
+            'filterForm' => $filterForm->createView(),
+            'form' => $deleteLocationForm->createView()
         ]);
     }
 

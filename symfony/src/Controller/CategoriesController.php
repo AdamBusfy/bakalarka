@@ -93,11 +93,11 @@ class CategoriesController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use ($deleteCategoryForm) {
+                'render' => function($value, $context) {
                     $data = '<div class="text-center">';
 //                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_category', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_category', ['id' => $value])]);
-                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['confirm' => true, 'id' => $value, 'form' => $deleteCategoryForm->createView()]);
+                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['confirm' => true, 'id' => $value]);
                     $data .= "</div>";
 
                     return $data;
@@ -131,7 +131,8 @@ class CategoriesController extends AbstractController
 
         return $this->render('page/category/categories.html.twig', [
             'datatable' => $table,
-            'filterForm' => $filterForm->createView()
+            'filterForm' => $filterForm->createView(),
+            'form' => $deleteCategoryForm->createView()
         ]);
     }
 

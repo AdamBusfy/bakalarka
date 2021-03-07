@@ -75,10 +75,10 @@ class UsersController extends AbstractController
             ('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function ($value, $context) use ($deleteUserForm) {
+                'render' => function ($value, $context) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/attach.html.twig', ['url' => $this->generateUrl('user_add_locations', ['id' => $value])]);
-                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value, 'form' => $deleteUserForm->createView()]);
+                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value]);
                     $data .= "</div>";
                     return $data;
                 }
@@ -143,7 +143,8 @@ class UsersController extends AbstractController
 
         return $this->render('page/users/users.html.twig', [
             'datatable' => $table,
-            'filterForm' => $filterForm->createView()
+            'filterForm' => $filterForm->createView(),
+            'form' => $deleteUserForm->createView()
         ]);
     }
 
@@ -318,9 +319,9 @@ class UsersController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function ($value, $context) use ($removeLocationForm) {
+                'render' => function ($value, $context) {
                     $data = '<div class="text-center">';
-                    $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value, 'form' => $removeLocationForm->createView()]);
+                    $data .= $this->renderView('layout/table/action/removeUsersFromLocation.html.twig', ['id' => $value]);
                     $data .= "</div>";
                     return $data;
                 }])
@@ -347,7 +348,8 @@ class UsersController extends AbstractController
 
         return $this->render('page/users/addLocations.html.twig', [
             'datatableAdd' => $tableAdd,
-            'datatableRemove' => $tableRemove
+            'datatableRemove' => $tableRemove,
+            'form' => $removeLocationForm->createView()
         ]);
     }
 

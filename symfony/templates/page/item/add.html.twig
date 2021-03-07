@@ -12,45 +12,58 @@
 
 {% block body %}
     <div class="container" style="width: 75%">
-        {{ form_start(addItemForm) }}
-        <div class="form-group">
-            {{ form_row(addItemForm.name, {
-                attr: {
-                    class: "form-control"
-                }
-            }) }}
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Add new Item
+                    </div>
+
+                    {{ form_start(addItemForm) }}
+
+                    <ul class="list-group list-group-flush">
+
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                {{ form_row(addItemForm.name, {
+                                    attr: {
+                                        class: "form-control"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(addItemForm.parent, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(addItemForm.location, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(addItemForm.category, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_row(addItemForm.submitButton) }}
+
+                        </li>
+                    </ul>
+                    {{ form_end(addItemForm) }}
+
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form_row(addItemForm.parent, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-        <div class="form-group">
-            {{ form_row(addItemForm.category, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-        <div class="form-group">
-            {{ form_row(addItemForm.location, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-{#        <div class="form-group row">#}
-{#            <label for="example-number-input" class="col-2 col-form-label">Number</label>#}
-{#            <div class="col-10">#}
-{#                <input class="form-control" type="number" value="42" id="example-number-input">#}
-{#            </div>#}
-{#        </div>#}
-        {{ form_end(addItemForm) }}
     </div>
 
 {% endblock %}

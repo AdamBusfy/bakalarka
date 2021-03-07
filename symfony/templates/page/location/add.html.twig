@@ -12,23 +12,43 @@
 
 {% block body %}
     <div class="container" style="width: 75%">
-        {{ form_start(addLocationForm) }}
-        <div class="form-group">
-            {{ form_row(addLocationForm.name, {
-                attr: {
-                    class: "form-control"
-                }
-            }) }}
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Add new Location
+                    </div>
+
+                    {{ form_start(addLocationForm) }}
+
+                    <ul class="list-group list-group-flush">
+
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                {{ form_row(addLocationForm.name, {
+                                    attr: {
+                                        class: "form-control"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(addLocationForm.parent, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_row(addLocationForm.submitButton) }}
+
+                        </li>
+                    </ul>
+                    {{ form_end(addLocationForm) }}
+
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form_row(addLocationForm.parent, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-        {{ form_end(addLocationForm) }}
     </div>
+
 
 {% endblock %}

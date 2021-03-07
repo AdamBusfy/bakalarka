@@ -13,9 +13,9 @@ class RemoveUserLocation extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('submitButton', SubmitType::class, [
-                'label' => '<i class="fa fa-minus"></i>',
+                'label' => 'Remove',
                 'label_html' => true,
-                'attr'=> ['class' =>'btn btn-danger btn-sm', 'style=> display:inline-block'],
+                'attr'=> ['class' =>'btn btn-danger', 'style=> display:inline-block'],
             ]);
     }
 
