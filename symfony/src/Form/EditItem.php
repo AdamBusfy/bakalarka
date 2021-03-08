@@ -6,6 +6,8 @@ use App\Entity\Category;
 use App\Entity\Item;
 use App\Entity\Location;
 use App\Entity\User;
+use App\Repository\CategoryRepository;
+use App\Repository\ItemRepository;
 use App\Repository\LocationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -29,12 +31,26 @@ class EditItem extends AbstractType
             ->add('parent', EntityTreeType::class, [
                 'class' => Item::class,
                 'choice_label' => 'name',
-                'required' => false
+                'required' => false,
+                'query_builder' => function (ItemRepository $repository) {
+                    $queryBuilder = $repository->createQueryBuilder('qb')
+                        ->select('i')
+                        ->from(Item::class, 'i');
+                    $queryBuilder->where('i.isActive = 1');
+                    return $queryBuilder;
+                }
             ])
             ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'required' => false
+                'required' => false,
+                'query_builder' => function (CategoryRepository $repository) {
+                    $queryBuilder = $repository->createQueryBuilder('qb')
+                        ->select('c')
+                        ->from(Category::class, 'c');
+                    $queryBuilder->andWhere('c.isActive = 1');
+                    return $queryBuilder;
+                }
             ])
             ->add('location', EntityTreeType::class, [
                 'class' => Location::class,
@@ -51,6 +67,8 @@ class EditItem extends AbstractType
                         }, $user->getLocations()->toArray());
                         $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
                     }
+
+                    $queryBuilder->andWhere('l.isActive = 1');
 
                     return $queryBuilder;
                 }

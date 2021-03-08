@@ -1,84 +1,82 @@
-{#<nav#}
-{#        class="navbar navbar-expand-lg navbar-light bg-light"#}
-{#        style="height: 70px;"#}
-{#>#}
-{#    <a class="navbar-brand" href="{{ path('homepage') }}">Property manager</a>#}
-{#    {% if app.user %}#}
-{#     <span class="navbar-text" style="text-decoration:none">{{ app.user.username }}</span>#}
-{#    {% endif %}#}
 
-{#    <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>#}
-{#    <ul class="nav navbar-nav navbar-right">#}
-{#        {% if app.user %}#}
-{#            <li><a class="nav-link" href="{{ path('users') }}">Users</a></li>#}
-{#            <li><a class="nav-link" href="{{ path('categories') }}">Categories</a></li>#}
-{#            <li><a class="nav-link" href="{{ path('locations') }}">Locations</a></li>#}
-{#            <li><a class="nav-link" href="{{ path('items') }}">Items</a></li>#}
-{#            <li><a class="nav-link" href="{{ path('homepage') }}">Home</a></li>#}
-{#            <li><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>#}
-{#        {% else %}#}
-{#            <li><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>#}
-{#            <li>#}
-{#                <a class="nav-link" href="{{ path('registration') }}">Register</a>#}
-{#            </li>#}
-{#        {% endif %}#}
-{#    </ul>#}
-{#</nav>#}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3" style="height: 80px">
-        <a class="navbar-brand" href="{{ path('homepage') }}">Property manager</a>
-        {% if app.user %}
-            <span class="navbar-text" style="text-decoration:none; margin-right: auto">{{ app.user.username }}</span>
-        {% endif %}
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="nav navbar-nav navbar-right" style="margin-left: auto">
-                {% set menuItems = {
-                    loggedIn: [
-                        {
-                            path: 'users',
-                            name: 'Users'
-                        },
-                        {
-                            path: 'categories',
-                            name: 'Categories'
-                        },
-                        {
-                            path: 'locations',
-                            name: 'Locations'
-                        },
-                        {
-                            path: 'items',
-                            name: 'Items'
-                        },
-                        {
-                            path: 'homepage',
-                            name: 'Home'
-                        },
-                        {
-                            path: 'app_logout',
-                            name: 'Logout'
-                        },
-                    ],
-                    loggedOut: [
-                        {
-                            path: 'app_login',
-                            name: 'Login'
-                        },
-                        {
-                            path: 'registration',
-                            name: 'Register'
-                        },
-                    ]
-                } %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3" style="height: 80px">
+    <a class="navbar-brand" href="{{ path('homepage') }}"><i class="fa fa-th-large"></i>&nbsp Property manager</a>
+    {% if app.user %}
+        <span class="navbar-text" style="text-decoration:none; margin-right: auto">{{ app.user.username }}</span>
+    {% endif %}
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="nav navbar-nav navbar-right" style="margin-left: auto">
+            {% set menuItems = {
+                loggedInAdmin: [
+                    {
+                        path: 'users',
+                        name: 'Users'
+                    },
+                    {
+                        path: 'categories',
+                        name: 'Categories'
+                    },
+                    {
+                        path: 'locations',
+                        name: 'Locations'
+                    },
+                    {
+                        path: 'items',
+                        name: 'Items'
+                    },
+                    {
+                        path: 'show_deleted_items',
+                        name: 'Deleted items'
+                    },
+                    {
+                        path: 'homepage',
+                        name: 'Home'
+                    },
+                    {
+                        path: 'app_logout',
+                        name: 'Logout'
+                    },
+                ],
+                loggedInUser: [
+                    {
+                        path: 'items',
+                        name: 'Items'
+                    },
+                    {
+                        path: 'homepage',
+                        name: 'Home'
+                    },
+                    {
+                        path: 'app_logout',
+                        name: 'Logout',
+                    },
+                ],
+                loggedOut: [
+                    {
+                        path: 'app_login',
+                        name: 'Login'
+                    },
+                    {
+                        path: 'registration',
+                        name: 'Register'
+                    },
+                ]
+            } %}
 
-                {% for item in menuItems[app.user ? 'loggedIn' : 'loggedOut'] %}
-                    <li class="nav-item{{ item.path == app.request.attributes.get('_route') ? ' active' : '' }}"><a class="nav-link" href="{{ path(item.path) }}">{{ item.name }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </nav>
+
+            {% for item in menuItems[app.user ? (is_granted('ROLE_ADMIN') ? 'loggedInAdmin' : 'loggedInUser') : 'loggedOut'] %}
+                <li class="nav-item{{ item.path == app.request.attributes.get('_route') ? ' active' : '' }}"><a
+                            class="nav-link" href="{{ path(item.path) }}">{{ item.name }}</a></li>
+            {% endfor %}
+
+
+
+        </ul>
+    </div>
+</nav>
 
 
 

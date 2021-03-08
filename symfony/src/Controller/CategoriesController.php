@@ -15,6 +15,7 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use Knp\Component\Pager\PaginatorInterface;
 
+/**
+ * Class CategoriesController
+ * @package App\Controller
+ * @IsGranted("ROLE_ADMIN")
+ * @IsGranted("IS_AUTHENTICATED_FULLY")
+ */
 class CategoriesController extends AbstractController
 {
     /**
@@ -119,6 +126,7 @@ class CategoriesController extends AbstractController
                                     );
                             }
                         }
+                        $builder->andWhere('category.isActive = 1');
                     },
                     new SearchCriteriaProvider()
                 ]
@@ -209,8 +217,10 @@ class CategoriesController extends AbstractController
             $this->deleteCategory($child);
         }
 
+        $category->setIsActive(false);
+
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($category);
+        $entityManager->persist($category);
         $entityManager->flush();
     }
 }

@@ -11,53 +11,59 @@
 {% endblock %}
 
 {% block body %}
-{#    <p>{{ editItem.getParent().getName() }}</p>#}
     <div class="container" style="width: 75%">
-        {{ form_start(editItemForm) }}
-        <div class="form-group">
-            {{ form_row(editItemForm.name, {
-                attr: {
-                    class: "form-control"
-                }
-            }) }}
-        </div>
-        <div class="form-group">
-            {{ form_row(editItemForm.parent, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-        <div class="form-group">
-            {{ form_row(editItemForm.category, {
-                attr: {
-                    class: "form-control selectpicker w-100",
-                    "data-live-search": "true"
-                }
-            }) }}
-        </div>
-        <div class="form-group">
+        <div class="row">
+            <div class="col">
+                <div class="card bg-dark">
+                    <div class="card-header text-white">
+                        Edit Item
+                    </div>
 
-            {% if editItem.getParent() is empty %}
-                {{ form_row(editItemForm.location, {
+                    {{ form_start(editItemForm) }}
 
-                    attr: {
-                        class: "form-control selectpicker w-100",
-                        "data-live-search": "true"
-                    }
-                }) }}
-                {% else %}
-                    {{ form_row(editItemForm.location, {
+                    <ul class="list-group list-group-flush">
 
-                        attr: {
-                            class: "form-control selectpicker w-100",
-                            "data-live-search": "true",
-                            "disabled": "true"
-                        }
-                    }) }}
-            {% endif %}
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                {{ form_row(editItemForm.name, {
+                                    attr: {
+                                        class: "form-control"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(editItemForm.parent, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(editItemForm.location, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(editItemForm.category, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true"
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_row(editItemForm.submitButton) }}
+
+                        </li>
+                    </ul>
+                    {{ form_end(editItemForm    ) }}
+
+                </div>
+            </div>
         </div>
-        {{ form_end(editItemForm) }}
     </div>
+
 {% endblock %}

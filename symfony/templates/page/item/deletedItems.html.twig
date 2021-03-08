@@ -1,52 +1,44 @@
 {% extends 'base.html.twig' %}
-{% block title %}Users{% endblock %}
+
+{% block title %}Show deleted item{% endblock %}
 
 {% block stylesheets %}
-    {{ encore_entry_link_tags('page-users') }}
+    {{ encore_entry_link_tags('page-showDeletedItems') }}
 {% endblock %}
 
 {% block javascripts %}
-    {{ encore_entry_script_tags('page-users') }}
+    {{ encore_entry_script_tags('page-showDeletedItems') }}
 {% endblock %}
 
 {% block body %}
     <div class="container">
-        {{ include('layout/modal/delete.html.twig') }}
         <div class="row">
             <div class="col">
-                <h2 class="text-secondary mb-3">Registered users</h2>
-                <div class="card mb-5 bg-dark">
+                <h2 class="text-secondary mb-3">Deleted Items</h2>
+                <div class="card mt-3 mb-5 bg-dark">
                     <div class="card-header text-white">
                         Filter
                     </div>
+                    {{ form_start(filterDeletedItems) }}
                     <div class="card-body bg-white">
-                        {{ form_start(filterForm) }}
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    {{ form_row(filterForm.name, {
+                                    {{ form_row(filterDeletedItems.name, {
                                         attr: {
                                             class: "selectpicker form-control"
                                         }
                                     }) }}
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    {{ form_row(filterForm.email, {
-                                        attr: {
-                                            class: "selectpicker form-control"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-1">
+                            <div class="col-5">
+
                             </div>
                             <div class="col-3 justify-content-center align-self-center">
                                 <div class="form-group">
                                     <label>&nbsp;</label>
-                                    {{ form_row(filterForm.submit, {
-                                        label: "###ICON### apply",
+                                    {{ form_row(filterDeletedItems.submit, {
+                                        label: "###ICON### apply filter",
                                         attr: {
                                             class: "form-control btn btn-outline-secondary btn-xs"
                                         }
@@ -54,39 +46,45 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-3">
                                 <div class="form-group">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                        <span class="input-group-text" id=""><i
-                                                    class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm.startDateTime) }}
+                                                    <span class="input-group-text" id=""><i
+                                                                class="fa fa-calendar"></i></span>
+                                            {{ form_row(filterDeletedItems.startDateTime) }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-3">
                                 <div class="form-group">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                        <span class="input-group-text" id=""><i
-                                                    class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm.endDateTime) }}
+                                                    <span class="input-group-text" id=""><i
+                                                                class="fa fa-calendar"></i></span>
+                                            {{ form_row(filterDeletedItems.endDateTime) }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-6">
+                            </div>
                         </div>
-
-                        {{ form_end(filterForm) }}
                     </div>
+                    {{ form_end(filterDeletedItems) }}
+
                 </div>
-                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable) }}'></div>
+
             </div>
         </div>
-    </div>
+        <div class="row mt-3">
+            <div class="col">
+                <div data-data-table data-options='{{ datatable_settings(dataTableDeletedItems) }}'></div>
+            </div>
+        </div>
+
+
     </div>
 {% endblock %}

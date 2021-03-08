@@ -13,28 +13,85 @@
 
 {% block body %}
     <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card text-left bg-dark">
+                    <div class="card-header card bg-dark text-white">
+                        Item detail
+                    </div>
+                    <div class="card-body bg-light">
+                        <h5 class="card-title"><strong>Name: </strong>{{ item.name }}</h5>
+                        <p class="card-text"><strong>Path: </strong> {{ item.getAncestors()
+                            |map(
+                                (ancestor, index) =>
+                            index == 0
+                            ? "<strong><a class='text-muted' href='#{ path('show_item', { 'id': ancestor.id }) }'>#{ancestor.name}</a></strong>"
+                            : "<a class='text-muted' href='#{ path('show_item', { 'id': ancestor.id }) }'>#{ancestor.name}</a>"
+                            )
+                            |reverse
+                            |join(' > ')
+                            |raw }}</p>
+                        <p class="card-text">
+                            <strong>Category :</strong>
+                            {% if item.getIsActive() == 1 %}
+                                {{ item.getCategory().getName() }}
+                            {% else %}
+                                &nbsp;
+                            {% endif %}
+                        </p>
+                        <p class="card-text">
+                            <strong>Location :</strong>
+                            {% if item.getIsActive() == 1 %}
+                                {{ item.getLocation() ? item.getLocation().getName() : "empty location" }}
+                            {% else %}
+                                &nbsp;
+                            {% endif %}
 
-        <div class="card text-center">
-            <div class="card-header">
-                Item detail
+                        </p>
+                        <p class="card-text">
+                            <strong>Components:</strong>
+                            {% for children in item.getChildren() %}
+                        <li><a class="text-info"
+                               href="{{ path('show_item', {id: children.id}) }}">{{ children.getName() }}</a></li>
+                        {% endfor %}
+                        </p>
+
+                        <p class="card-text">
+                            <strong>State :</strong>
+
+                            {% if item.getIsActive() == 1 %}
+                                <a class="text-success">Active</a>
+                            {% else %}
+                                <a class="text-danger">Deleted</a>
+                            {% endif %}
+
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Date created :</strong> {{ item.getDateCreate()|date('d/m/Y') }}
+                        </p>
+                    </div>
+
+
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title"><strong>Name: </strong>{{ item.name }}</h5>
-                <p class="card-text"><strong>Path: </strong> {{ item.getAncestors()
-                    |map(
-                        (ancestor, index) =>
-                    index == 0
-                    ? "<strong><a class='text-muted' href='#{ path('show_item', { 'id': ancestor.id }) }'>#{ancestor.name}</a></strong>"
-                    : "<a class='text-muted' href='#{ path('show_item', { 'id': ancestor.id }) }'>#{ancestor.name}</a>"
-                    )
-                    |reverse
-                    |join(' > ')
-                    |raw }}</p>
-            </div>
-            <div class="card-footer text-muted">
-                Som fest najvacsi frajer
+            <div class="col-8">
+
+                <div class="card text-left bg-dark">
+                    <div class="card-header card bg-dark text-white">
+                        Item history
+                    </div>
+                    <div class="card-body bg-white">
+                        <div class="mt-3" data-data-table
+                             data-options='{{ datatable_settings(dataTableHistory) }}'></div>
+
+                    </div>
+
+                </div>
+
             </div>
         </div>
+
 
     </div>
 {% endblock %}

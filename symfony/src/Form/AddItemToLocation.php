@@ -42,7 +42,9 @@ class AddItemToLocation extends AbstractType
                         }, $user->getLocations()->toArray());
                         $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
                     }
-
+                    $queryBuilder
+                        ->andWhere('l.isActive = :active')
+                        ->setParameter('active', 1);
                     return $queryBuilder;
                 }
             ])

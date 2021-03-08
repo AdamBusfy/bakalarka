@@ -17,11 +17,19 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function Clue\StreamFilter\fun;
 
+/**
+ * Class UsersController
+ * @package App\Controller
+ * @IsGranted("ROLE_ADMIN")
+ * @IsGranted("IS_AUTHENTICATED_FULLY")
+ */
 class UsersController extends AbstractController
 {
     /**
@@ -43,7 +51,8 @@ class UsersController extends AbstractController
 
             if (!empty($deleteUser)) {
                 $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->remove($deleteUser);
+                $deleteUser->setIsActive(false);
+                $entityManager->persist($deleteUser);
                 $entityManager->flush();
                 return $this->redirectToRoute('users');
 
@@ -131,6 +140,8 @@ class UsersController extends AbstractController
                                     );
                             }
                         }
+                        $builder->andWhere('user.isActive = 1');
+
                     },
                     new SearchCriteriaProvider()
                 ]
@@ -176,7 +187,11 @@ class UsersController extends AbstractController
             return $this->redirect($request->getUri());
         }
 
+        $filterLeftForm = $this->createForm(\App\Form\Users\FilterAddLocationsLeft::class, null, ['csrf_protection' => false]);
+        $filterLeftForm->handleRequest($request);
+
         $tableAdd = $dataTableFactory->create()
+            ->setName('LeftTable')
             ->add('id', TextColumn::class, [
                 'propertyPath' => 'id',
                 'label' => 'ID',
@@ -221,7 +236,6 @@ class UsersController extends AbstractController
                     return $data;
                 }
             ])
-            ->setName('first')
             ->createAdapter(FetchJoinORMAdapter::class, [
                 'entity' => Location::class,
                 'simple_total_query' => false,
@@ -249,8 +263,23 @@ class UsersController extends AbstractController
                             $builder
                                 ->where($builder->expr()->notIn('l.id', $assignedLocationIds));
                         }
+
+                        $nameLeft = $_GET['filter_add_locations_left']['name'] ?? null;
+
+                        if (!empty(array_filter([$nameLeft]))) {
+                            if (!empty($nameLeft)) {
+                                $builder
+                                    ->andWhere('l.name LIKE :name') // TODO ???
+                                    ->setParameter(
+                                        'name',
+                                        "%" . $nameLeft . "%"
+                                    );
+                            }
+                        }
+                        $builder->andWhere('l.isActive = 1');
                     },
                 ],
+
             ])
             ->handleRequest($request);
 
@@ -272,16 +301,16 @@ class UsersController extends AbstractController
 
             if (!empty($removeLocation)) {
                 $this->removeLocations($removeLocation, $user);
-//                $removeLocation->removeUser($user);
             }
 
-//            $entityManager = $this->getDoctrine()->getManager();
-//            $entityManager->persist($removeLocation);
-//            $entityManager->flush();
             return $this->redirectToRoute('user_add_locations', array('id' => $id));
         }
 
+        $filterRightForm = $this->createForm(\App\Form\Users\FilterAddLocationsRight::class, null, ['csrf_protection' => false]);
+        $filterRightForm->handleRequest($request);
+
         $tableRemove = $dataTableFactory->create()
+            ->setName('RightTable')
             ->add('id', TextColumn::class, [
                 'propertyPath' => 'id',
                 'label' => 'ID',
@@ -325,7 +354,6 @@ class UsersController extends AbstractController
                     $data .= "</div>";
                     return $data;
                 }])
-            ->setName('second')
             ->createAdapter(FetchJoinORMAdapter::class, [
                 'entity' => Location::class,
                 'simple_total_query' => false,
@@ -337,8 +365,23 @@ class UsersController extends AbstractController
                             ->join('l.users', 'lu')
                             ->where('lu.id = :uid')
                             ->setParameter('uid', $id);
+                        $builder->andWhere('l.isActive = 1');
+
+                        $nameRight = $_GET['filter_add_locations_right']['name'] ?? null;
+
+                        if (!empty(array_filter([$nameRight]))) {
+                            if (!empty($nameRight)) {
+                                $builder
+                                    ->andWhere('l.name LIKE :name') // TODO ???
+                                    ->setParameter(
+                                        'name',
+                                        "%" . $nameRight . "%"
+                                    );
+                            }
+                        }
                     },
                 ],
+
             ])
             ->handleRequest($request);
 
@@ -349,7 +392,9 @@ class UsersController extends AbstractController
         return $this->render('page/users/addLocations.html.twig', [
             'datatableAdd' => $tableAdd,
             'datatableRemove' => $tableRemove,
-            'form' => $removeLocationForm->createView()
+            'form' => $removeLocationForm->createView(),
+            'filterLeftForm' => $filterLeftForm->createView(),
+            'filterRightForm' => $filterRightForm->createView(),
         ]);
     }
 

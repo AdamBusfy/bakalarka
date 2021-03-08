@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class FilterLeft extends AbstractType
+class FilterDeletedItems extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -20,18 +20,6 @@ class FilterLeft extends AbstractType
             ->setMethod('GET')
             ->add('name', TextType::class, [
                 'required' => false
-            ])
-            ->add('category', EntityTreeType::class, [
-                'class' => Category::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'query_builder' => function (CategoryRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('c')
-                        ->from(Category::class, 'c');
-                    $queryBuilder->andWhere('c.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('startDateTime', TextType::class, [
                 'attr' => [

@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Location;
 use App\Entity\User;
 use App\Form\EntityTreeType;
+use App\Repository\CategoryRepository;
 use App\Repository\LocationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -44,6 +45,9 @@ class FilterRight extends AbstractType
                         }, $user->getLocations()->toArray());
                         $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
                     }
+                    $queryBuilder
+                        ->andWhere('l.isActive = :active')
+                        ->setParameter('active', 1);
 
                     return $queryBuilder;
                 }
@@ -51,7 +55,14 @@ class FilterRight extends AbstractType
             ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'required' => false
+                'required' => false,
+                'query_builder' => function (CategoryRepository $repository) {
+                    $queryBuilder = $repository->createQueryBuilder('qb')
+                        ->select('c')
+                        ->from(Category::class, 'c');
+                    $queryBuilder->andWhere('c.isActive = 1');
+                    return $queryBuilder;
+                }
             ])
             ->add('startDateTime', TextType::class, [
                 'attr' => [

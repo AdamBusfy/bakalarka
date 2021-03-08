@@ -36,6 +36,7 @@ Encore
     .addEntry('page-editItem', './assets/js/page/editItem.js')
     .addEntry('page-users', './assets/js/page/users.js')
     .addEntry('page-addUserLocations', './assets/js/page/addUserLocations.js')
+    .addEntry('page-showDeletedItems', './assets/js/page/showDeletedItems.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     // .enableStimulusBridge('./assets/controllers.json')

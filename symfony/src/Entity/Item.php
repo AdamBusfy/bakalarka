@@ -53,10 +53,21 @@ class Item
      */
     private $location;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isActive = true;
+
+    /**
+     * @ORM\OneToMany(targetEntity=History::class, mappedBy="item", orphanRemoval=true)
+     */
+    private $histories;
+
     public function __construct()
     {
         $this->date_create = new DateTime();
         $this->children = new ArrayCollection();
+        $this->histories = new ArrayCollection();
     }
 
     /**
@@ -171,5 +182,47 @@ class Item
         }
 
         return $ancestors;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|History[]
+     */
+    public function getHistories(): Collection
+    {
+        return $this->histories;
+    }
+
+    public function addHistory(History $history): self
+    {
+        if (!$this->histories->contains($history)) {
+            $this->histories[] = $history;
+            $history->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistory(History $history): self
+    {
+        if ($this->histories->removeElement($history)) {
+            // set the owning side to null (unless already changed)
+            if ($history->getItem() === $this) {
+                $history->setItem(null);
+            }
+        }
+
+        return $this;
     }
 }

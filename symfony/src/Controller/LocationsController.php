@@ -14,11 +14,18 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class LocationsController
+ * @package App\Controller
+ * @IsGranted("ROLE_ADMIN")
+ * @IsGranted("IS_AUTHENTICATED_FULLY")
+ */
 class LocationsController extends AbstractController
 {
     /**
@@ -89,7 +96,7 @@ class LocationsController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) use ($deleteLocationForm) {
+                'render' => function($value, $context) {
                     $data = '<div class="text-center">';
 //                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_location', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_location', ['id' => $value])]);
@@ -115,6 +122,7 @@ class LocationsController extends AbstractController
                                     );
                             }
                         }
+                        $builder->andWhere('location.isActive = 1');
                     },
                     new SearchCriteriaProvider()
                 ]
@@ -204,8 +212,10 @@ class LocationsController extends AbstractController
             $this->deleteLocation($child);
         }
 
+        $location->setIsActive(false);
+
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($location);
+        $entityManager->persist($location);
         $entityManager->flush();
     }
 }
