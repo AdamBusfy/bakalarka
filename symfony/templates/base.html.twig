@@ -6,12 +6,130 @@
 
     <title>{% block title %}Gallery{% endblock %}</title>
     {% block stylesheets %}{% endblock %}
-{#    <link rel="shortcut icon" href="#">#}
+    {# <link rel="shortcut icon" href="#"> #}
 
 </head>
-<body>
-{% include('layout/navbar.html.twig') %}
-{% block body %}{% endblock %}
-{% block javascripts %}{% endblock %}
+<body class="c-app">
+{# {% include('layout/navbar.html.twig') %} #}
+{% block javascripts %}
+{% endblock %}
+
+{% if app.user %}
+    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
+        <div class="c-sidebar-brand d-lg-down-none">
+            <h3 class="c-sidebar-brand-full" width="118" height="46"><strong>Property manager</strong></h3>
+            <i class="c-sidebar-brand-minimized fas fa-box-open" width="46" height="46"></i>
+        </div>
+        <ul class="c-sidebar-nav">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ path('homepage') }}">
+                    <i class="c-sidebar-nav-icon fas fa-home"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="c-sidebar-nav-title">Items</li>
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path('items') }}">
+                    <i class="c-sidebar-nav-icon fas fa-cube"></i>
+                    Items
+                    <span class="badge badge-info">NEW</span>
+                </a>
+
+            </li>
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ path('show_deleted_items') }}">
+                    <i class="c-sidebar-nav-icon fas fa-eraser"></i>
+                    Deleted items
+                </a>
+            </li>
+            {% if is_granted('ROLE_ADMIN') %}
+                <li class="c-sidebar-nav-title">Admin</li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ path('users') }}">
+                        <i class="c-sidebar-nav-icon fas fa-users"></i>
+                        Users
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ path('categories') }}">
+                        <i class="c-sidebar-nav-icon fas fa-cubes"></i>
+                        Categories
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ path('locations') }}">
+                        <i class="c-sidebar-nav-icon fas fa-location-arrow"></i>
+                        Locations
+                    </a>
+                </li>
+            {% endif %}
+
+
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link c-sidebar-nav-link-danger" href="{{ path('app_logout') }}">
+                    <i class="c-sidebar-nav-icon fas fa-sign-out-alt"></i>
+                    <strong>Logout</strong>
+                </a>
+            </li>
+        </ul>
+        <button class="c-sidebar-minimizer c-class-toggler" type="button" data-target="_parent"
+                data-class="c-sidebar-minimized"></button>
+    </div>
+{% endif %}
+
+<div class="c-wrapper c-fixed-components">
+    <header class="c-header c-header-light c-header-fixed c-header-with-subheader">
+        {% block tabs %}{% endblock %}
+        {% if app.user %}
+            <ul class="c-header-nav ml-auto mr-4">
+                <li class="c-header-nav-item dropdown">
+                    <a class="c-header-nav-link" data-toggle="dropdown" href="#"
+                       role="button" aria-haspopup="true" aria-expanded="false">
+                        <div class="c-avatar">
+                            <i class="fas fa-user-tie fa-2x"></i>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right pt-0">
+                        <div class="dropdown-header bg-light py-2">
+                            <strong>Account</strong>
+                        </div>
+                        <a class="dropdown-item" href="{{ path('homepage') }}">
+                            <i class="c-icon mr-2 fas fa-user"></i>
+                            Profile</a>
+                        <div class="dropdown-header bg-light py-2">
+                            <strong>Settings</strong>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ path('app_logout') }}">
+                            <i class="c-icon mr-2 fas fa-sign-out-alt"></i>
+                            Logout </a>
+                    </div>
+                </li>
+            </ul>
+        {% endif %}
+        {# <div class="c-subheader px-3"> #}
+        {# <!-- Breadcrumb--> #}
+        {# <ol class="breadcrumb border-0 m-0"> #}
+        {# <li class="breadcrumb-item">Home</li> #}
+        {# <li class="breadcrumb-item"><a href="#">Admin</a></li> #}
+        {# <li class="breadcrumb-item active">Dashboard</li> #}
+        {# <!-- Breadcrumb Menu--> #}
+        {# </ol> #}
+        {# </div> #}
+    </header>
+    <div class="c-body">
+        <main class="c-main">
+
+            {% block body %}
+
+            {% endblock %}
+        </main>
+        <footer class="c-footer">
+            <div><a href="#">PropertyManager</a> &copy; 2021 pogChamp</div>
+            <div class="ml-auto">Created by&nbsp;<a href="#">Adam Bušfy</a></div>
+        </footer>
+    </div>
+</div>
 </body>
 </html>

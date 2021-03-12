@@ -24,7 +24,7 @@ datatables:
   template_parameters:
 
     # Default class attribute to apply to the root table elements
-    className:        'table table-striped table-bordered '
+    className:        'table table-striped table-bordered bg-white'
 
     # If and where to enable the DataTables FilterRight module
     columnFilter:     null # One of "thead"; "tfoot"; "both"; null

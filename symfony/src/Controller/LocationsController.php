@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Item;
 use App\Entity\Location;
+use App\Entity\User;
 use App\Form\AddLocation;
 use App\Form\Location\Filter;
 use App\Form\DeleteForm;
@@ -98,7 +99,7 @@ class LocationsController extends AbstractController
                 'propertyPath' => 'id',
                 'render' => function($value, $context) {
                     $data = '<div class="text-center">';
-//                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_location', ['id' => $value])]);
+                    $data .= $this->renderView('layout/table/action/addChildLocation.html.twig', ['url' => $this->generateUrl('add_location_withId', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_location', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value]);
                     $data .= "</div>";
@@ -142,14 +143,22 @@ class LocationsController extends AbstractController
 
     /**
      * @Route("/add/location", name="add_location")
+     * @Route("/add/location/{id}", name="add_location_withId")
      * @param Request $request
      * @return Response
      */
-    public function add(Request $request): Response
+    public function add(Request $request, int $id = 0): Response
     {
+        $locationRepository = $this->getDoctrine()
+            ->getRepository(Location::class);
+
+        $presetLocation = !empty($id) ? $locationRepository->find($id) : null;
+
 
         $addLocation = new Location();
-        $addLocationForm = $this->createForm(AddLocation::class, $addLocation);
+        $addLocationForm = $this->createForm(AddLocation::class, $addLocation, array(
+            'presetLocation' => $presetLocation,
+        ));
         $addLocationForm->handleRequest($request);
 
         if ($addLocationForm->isSubmitted() && $addLocationForm->isValid()) {

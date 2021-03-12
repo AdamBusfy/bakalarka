@@ -9,178 +9,237 @@
     {{ encore_entry_script_tags('page-items') }}
 {% endblock %}
 
+{% block tabs %}
+    <ul class="nav nav-tabs mt-3" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#items-list-tab-1" role="tab">Unassigned items</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#items-list-tab-2" role="tab">Assigned items</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#items-list-tab-3" role="tab">Import / Export items</a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block body %}
-    <div class="container-fluid" style="width: 95%">
+    <div class="container-fluid">
         {{ include('layout/modal/addItemToLocation.html.twig') }}
         {{ include('layout/modal/removeItemFromLocation.html.twig') }}
         {{ include('layout/modal/delete.html.twig') }}
 
         <div class="row">
             <div class="col">
-                {% if is_granted('ROLE_ADMIN') %}
-                    <div >
-                        <a href="{{ path('add_item') }}" type="button" class="btn btn-success btn-lg"><span
-                                    class="fa fa-plus"></span> Add new item </a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <h2 class="text-secondary mt-3 mb-3">Unassigned items</h2>
-                <div class="card mt-3 mb-5 bg-dark">
-                    <div class="card-header text-white">
-                        Filter
-                    </div>
-                    <div class="card-body bg-white">
-                        {{ form_start(filterForm_left) }}
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    {{ form_row(filterForm_left.name, {
-                                        attr: {
-                                            class: "selectpicker form-control"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    {{ form_row(filterForm_left.category, {
-                                        attr: {
-                                            class: "selectpicker form-control",
-                                            "data-live-search": "true"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-1">
 
-                            </div>
-                            <div class="col-3 justify-content-center align-self-center">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    {{ form_row(filterForm_left.submit, {
-                                        label: "###ICON### apply",
-                                        attr: {
-                                            class: "form-control btn btn-outline-secondary btn-xs"
-                                        }
-                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
-                                </div>
-                            </div>
-                        </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="items-list-tab-1" role="tabpanel"
+                         aria-labelledby="home-tab">
                         <div class="row">
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                                    <span class="input-group-text" id=""><i
-                                                                class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm_left.startDateTime) }}
-                                        </div>
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <div>
+                                                <a href="{{ path('add_item') }}" type="button" class="btn btn-success btn-lg"><span
+                                                            class="c-icon fas fa-plus"></span> Add new item </a>
+                                            </div>
+
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
+
+                                <h2 class="c-header-dark mt-3 mb-3">Unassigned items</h2>
+                                <div class="card mt-3 mb-5 bg-dark">
+                                    <div class="card-header text-white">
+                                        Filter
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        {{ form_start(filterForm_left) }}
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="form-group">
+                                                    {{ form_row(filterForm_left.name, {
+                                                        attr: {
+                                                            class: "form-control"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="form-group">
+                                                    {{ form_row(filterForm_left.category, {
+                                                        attr: {
+                                                            class: "selectpicker form-control",
+                                                            "data-live-search": "true"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-1">
+
+                                            </div>
+                                            <div class="col-3 justify-content-center align-self-center">
+                                                <div class="form-group">
+                                                    <label>&nbsp;</label>
+                                                    {{ form_row(filterForm_left.submit, {
+                                                        label: "###ICON### apply",
+                                                        attr: {
+                                                            class: "form-control btn btn-outline-secondary btn-xs"
+                                                        }
+                                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
                                                     <span class="input-group-text" id=""><i
                                                                 class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm_left.endDateTime) }}
+                                                            {{ form_row(filterForm_left.startDateTime) }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                    <span class="input-group-text" id=""><i
+                                                                class="fa fa-calendar"></i></span>
+                                                            {{ form_row(filterForm_left.endDateTime) }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                            </div>
                                         </div>
+                                        {{ form_end(filterForm_left) }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
+
+                                <div class="mt-3" data-data-table
+                                     data-options='{{ datatable_settings(datatable_left) }}'></div>
                             </div>
                         </div>
-                        {{ form_end(filterForm_left) }}
+                    </div>
+                    <div class="tab-pane fade" id="items-list-tab-2" role="tabpanel">
+                        <div class="row">
+                            <div class="col">
+                                <h2 class="c-header-dark mt-3 mb-3">Assigned items</h2>
+                                <div class="card mt-3 mb-5 bg-dark">
+                                    <div class="card-header text-white">
+                                        Filter
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        {{ form_start(filterForm_right) }}
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    {{ form_row(filterForm_right.name, {
+                                                        attr: {
+                                                            class: "form-control"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    {{ form_row(filterForm_right.location, {
+                                                        attr: {
+                                                            class: "selectpicker form-control",
+                                                            "data-live-search": "true"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    {{ form_row(filterForm_right.category, {
+                                                        attr: {
+                                                            class: "selectpicker form-control",
+                                                            "data-live-search": "true"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-3 justify-content-center align-self-center">
+                                                <div class="form-group">
+                                                    <label>&nbsp;</label>
+                                                    {{ form_row(filterForm_right.submit, {
+                                                        label: "###ICON### apply",
+                                                        attr: {
+                                                            class: "form-control btn btn-outline-secondary btn-xs"
+                                                        }
+                                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                    <span class="input-group-text" id=""><i
+                                                                class="fa fa-calendar"></i></span>
+                                                            {{ form_row(filterForm_right.startDateTime) }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                    <span class="input-group-text" id=""><i
+                                                                class="fa fa-calendar"></i></span>
+                                                            {{ form_row(filterForm_right.endDateTime) }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                            </div>
+                                        </div>
+                                        {{ form_end(filterForm_right) }}
+                                    </div>
+                                </div>
+                                <div class="mt-3" data-data-table
+                                     data-options='{{ datatable_settings(datatable_right) }}'></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="items-list-tab-3" role="tabpanel">
+                        <div class="row">
+                            <div class="col">
+                                <a href="{{ path('export_csv') }}" type="button"
+                                   class="btn btn-dark btn-lg"><span
+                                            class="c-icon fas fa-plus"></span> Export to csv </a>
+                            </div>
+                            <div class="col">
+                                {{ form_start(uploadCsvFileForm) }}
+                                <div class="form-group">
+                                    <label for="exampleFormControlFile1">Import items</label>
+
+                                    <div class="mb-2">
+                                        {{ form_row(uploadCsvFileForm.file) }}
+
+                                    </div>
+
+                                    {{ form_row(uploadCsvFileForm.submit, {
+                                        attr: {
+                                            class: "btn-primary"
+                                        }
+                                    }) }}
+                                </div>
+                                {{ form_end(uploadCsvFileForm) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable_left) }}'></div>
-            </div>
-            <div class="col">
-                <h2 class="text-secondary mt-3 mb-3">Assigned items</h2>
-                <div class="card mt-3 mb-5 bg-dark">
-                    <div class="card-header text-white">
-                        Filter
-                    </div>
-                    <div class="card-body bg-white">
-                        {{ form_start(filterForm_right) }}
-                        <div class="row">
-                            <div class="col-3">
-                                <div class="form-group">
-                                    {{ form_row(filterForm_right.name, {
-                                        attr: {
-                                            class: "selectpicker form-control"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    {{ form_row(filterForm_right.location, {
-                                        attr: {
-                                            class: "selectpicker form-control",
-                                            "data-live-search": "true"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    {{ form_row(filterForm_right.category, {
-                                        attr: {
-                                            class: "selectpicker form-control",
-                                            "data-live-search": "true"
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="col-3 justify-content-center align-self-center">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    {{ form_row(filterForm_right.submit, {
-                                        label: "###ICON### apply",
-                                        attr: {
-                                            class: "form-control btn btn-outline-secondary btn-xs"
-                                        }
-                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                                    <span class="input-group-text" id=""><i
-                                                                class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm_right.startDateTime) }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                                    <span class="input-group-text" id=""><i
-                                                                class="fa fa-calendar"></i></span>
-                                            {{ form_row(filterForm_right.endDateTime) }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                            </div>
-                        </div>
-                        {{ form_end(filterForm_right) }}
-                    </div>
-                </div>
-                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatable_right) }}'></div>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Location;
+use App\Entity\User;
 use App\Repository\LocationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,11 +15,16 @@ class AddLocation extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $location = $options['presetLocation'];
+//        var_dump($location);exit;
+        //exit;
+
         $builder
             ->add('name', TextType::class)
             ->add('parent', EntityTreeType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',
+                'data' => $location,
                 'required' => false,
                 'query_builder' => function (LocationRepository $repository) {
                     $queryBuilder = $repository->createQueryBuilder('qb')
@@ -37,7 +43,11 @@ class AddLocation extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Location::class,
+            'presetLocation' => null,
         ]);
+        $resolver->addAllowedTypes('presetLocation', [Location::class, 'null']);
+
+//        $resolver->setAllowedTypes('presetLocation', Location::class);
+
     }
 }

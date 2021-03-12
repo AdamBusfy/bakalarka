@@ -6,11 +6,11 @@ use App\Entity\Category;
 use App\Entity\History;
 use App\Entity\Item;
 use App\Entity\Location;
-use App\Entity\User;
 use App\Form\AddItem;
 use App\Form\AddItemToLocation;
 use App\Form\DeleteForm;
 use App\Form\EditItem;
+use App\Form\Item\FileUpload;
 use App\Form\Item\FilterDeletedItems;
 use App\Form\Item\FilterLeft;
 use App\Form\Item\FilterRight;
@@ -21,15 +21,19 @@ use Omines\DataTablesBundle\Adapter\Doctrine\FetchJoinORMAdapter;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
+use Omines\DataTablesBundle\Column\NumberColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
+use Omines\DataTablesBundle\DataTable;
 use Omines\DataTablesBundle\DataTableFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use function Clue\StreamFilter\fun;
 
 /**
  * Class ItemsController
@@ -47,6 +51,14 @@ class ItemsController extends AbstractController
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
 
+        $uploadCsvFileForm = $this->createForm(FileUpload::class);
+        $uploadCsvFileForm->handleRequest($request);
+
+        if ($uploadCsvFileForm->isSubmitted() && $uploadCsvFileForm->isValid()) {
+            $csvFile = $uploadCsvFileForm->get('file')->getData();
+            $this->csvImportItems($csvFile);
+        }
+
         $addItemToLocationForm = $this->createForm(AddItemToLocation::class, null, ['csrf_protection' => false, 'user' => $this->getUser()]);
         $addItemToLocationForm->handleRequest($request);
 
@@ -57,10 +69,11 @@ class ItemsController extends AbstractController
             /** @var Item $itemAdd */
             $itemAdd = $itemRepository->find($addItemToLocationForm->get('id')->getData());
 
-
             if (!empty($itemAdd)) {
 
                 $this->editChildren($itemAdd, $addItemToLocationForm->get('location')->getData());
+                $this->addToHistory($itemAdd);
+
                 return $this->redirect($request->getUri());
             }
         }
@@ -77,10 +90,10 @@ class ItemsController extends AbstractController
 
             if (!empty($itemRemove)) {
                 $this->editChildren($itemRemove, null);
+                $this->addToHistory($itemRemove);
                 return $this->redirect($request->getUri());
             }
         }
-
 
         //DELETE
 
@@ -127,10 +140,8 @@ class ItemsController extends AbstractController
                         );
                     }
                     return sprintf(
-//                        '<a href="../../show/location/%s"> %s</a>'
                         '<a> %s</a>'
                         ,
-//                        $context->getLocation()->getId(),
                         $context->getLocation()->getName()
                     );
                 }])
@@ -145,10 +156,8 @@ class ItemsController extends AbstractController
                         );
                     }
                     return sprintf(
-//                        '<a href="../../show/category/%s"> %s</a>'
                         '<a> %s</a>'
                         ,
-//                        $context->getCategory()->getId(),
                         $context->getCategory()->getName()
                     );
                 }])
@@ -180,11 +189,13 @@ class ItemsController extends AbstractController
                     return implode(" > ", $links);
                 }
             ])
+            ->add('price', NumberColumn::class, [
+                'label' => 'Price',
+            ])
             ->add('date_create', DateTimeColumn::class, [
                 'format' => 'd/m/Y',
                 'label' => "Timestamp",
                 'globalSearchable' => false
-
             ])
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
@@ -345,6 +356,9 @@ class ItemsController extends AbstractController
                     return implode(" > ", $links);
                 }
             ])
+            ->add('price', NumberColumn::class, [
+                'label' => 'Price',
+            ])
             ->add('date_create', DateTimeColumn::class, [
                 'format' => 'd/m/Y',
                 'label' => "Timestamp",
@@ -457,7 +471,8 @@ class ItemsController extends AbstractController
             'filterForm_left' => $filterFormLeftTable->createView(),
             'addItemToLocationForm' => $addItemToLocationForm->createView(),
             'removeItemFromLocationForm' => $removeItemFromLocationForm->createView(),
-            'form' => $deleteItemForm->createView()
+            'form' => $deleteItemForm->createView(),
+            'uploadCsvFileForm' => $uploadCsvFileForm->createView()
         ]);
     }
 
@@ -516,14 +531,6 @@ class ItemsController extends AbstractController
                 },
                 'orderable' => false,
             ])
-//            ->add('isActive', TextColumn::class, [
-//                'field' => 'item.isActive',
-//                'label' => 'State',
-//                'render' => function ($value, History $context) {
-//                    return $context->getItem()->getIsActive() ? 'Active' : 'Deleted';
-//                },
-//                'orderable' => false,
-//            ])
             ->add('location', TextColumn::class, [
                 'field' => 'location.name',
                 'label' => 'Location',
@@ -539,6 +546,9 @@ class ItemsController extends AbstractController
                     return $context->getCategory()->getName();
                 },
                 'orderable' => false,
+            ])
+            ->add('price', NumberColumn::class, [
+                'label' => 'Price',
             ])
             ->add('date_create', DateTimeColumn::class, [
                 'format' => 'd/m/Y H:i:s',
@@ -564,9 +574,25 @@ class ItemsController extends AbstractController
             return $tableHistory->getResponse();
         }
 
+        $historyRepository = $this->getDoctrine()
+            ->getRepository(History::class);
+
+        $historyPrices = $historyRepository->createQueryBuilder('h')
+            ->join('h.item', 'i')
+            ->where('i = :iid')
+            ->setParameter('iid', $id)
+            ->select('h.price')
+            ->getQuery()
+            ->getResult();
+
+        $historyPrices = array_map(function (array $price) {
+            return $price['price'];
+        }, $historyPrices);
+
         return $this->render('page/item/show.html.twig', [
             'item' => $item,
-            'dataTableHistory' => $tableHistory
+            'dataTableHistory' => $tableHistory,
+            'historyPrices' => $historyPrices,
         ]);
     }
 
@@ -581,8 +607,7 @@ class ItemsController extends AbstractController
         $itemRepository = $this->getDoctrine()
             ->getRepository(Item::class);
         $editItem = $itemRepository->find($id);
-        $oldEditItemName = $itemRepository->find($id)->getName();
-        $oldEditItemParent = $itemRepository->find($id)->getParent();
+        $oldEditItemPrice = $itemRepository->find($id)->getPrice();
         $oldEditItemLocation = $itemRepository->find($id)->getLocation();
         $oldEditItemCategory = $itemRepository->find($id)->getCategory();
 
@@ -599,17 +624,15 @@ class ItemsController extends AbstractController
             if (!empty($editItem)) {
 
                 if ($editItem->getParent() === null) {
-                    if ($editItemForm->get('name')->getData() !== $oldEditItemName ||
-                        $editItemForm->get('parent')->getData() !== $oldEditItemParent ||
-                        $editItemForm->get('location')->getData() !== $oldEditItemLocation ||
-                        $editItemForm->get('category')->getData() !== $oldEditItemCategory) {
+                    if ($editItemForm->get('location')->getData() !== $oldEditItemLocation ||
+                        $editItemForm->get('category')->getData() !== $oldEditItemCategory ||
+                        $editItemForm->get('price')->getData() !== $oldEditItemPrice) {
 
                         $this->addToHistory($editItem);
                     }
                 } else {
-                    if ($editItemForm->get('name')->getData() !== $oldEditItemName ||
-                        $editItemForm->get('parent')->getData() !== $oldEditItemParent ||
-                        $editItemForm->get('category')->getData() !== $oldEditItemCategory) {
+                    if ($editItemForm->get('category')->getData() !== $oldEditItemCategory ||
+                        $editItemForm->get('price')->getData() !== $oldEditItemPrice) {
 
                         $this->addToHistory($editItem);
                     }
@@ -639,6 +662,40 @@ class ItemsController extends AbstractController
     }
 
     /**
+     * @Route("/export/csv/", name="export_csv")
+     * @param Request $request
+     * @return Response
+     */
+    public function exportData(Request $request): Response
+    {
+        $results = $categoryRepository = $this->getDoctrine()
+            ->getRepository(Item::class)->findAll();
+
+        $response = new StreamedResponse();
+        $response->setCallback(
+            function () use ($results) {
+                $handle = fopen('php://output', 'r+');
+                foreach ($results as $row) {
+                    //array list fields you need to export
+                    $data = array(
+                        $row->getId(),
+                        $row->getName(),
+                        $row->getCategory()->getName(),
+                        $row->getPrice(),
+                        $row->getDateCreate()->format('m/d/Y'),
+                    );
+                    fputcsv($handle, $data);
+                }
+                fclose($handle);
+            }
+        );
+        $response->headers->set('Content-Type', 'application/force-download');
+        $response->headers->set('Content-Disposition', 'attachment; filename="export.csv"');
+
+        return $response;
+    }
+
+    /**
      * @Route("/show/deletedItems/", name="show_deleted_items")
      * @param Request $request
      * @param DataTableFactory $dataTableFactory
@@ -650,7 +707,6 @@ class ItemsController extends AbstractController
         $filterFormDeletedItemsTable->handleRequest($request);
 
         $tableDeletedItems = $dataTableFactory->create()
-
             ->setName('DeletedItems')
             ->add('id', TextColumn::class, [
                 'propertyPath' => 'id',
@@ -779,9 +835,48 @@ class ItemsController extends AbstractController
         $history->setCategory($item->getCategory());
         $history->setLocation($item->getLocation());
         $history->setUser($this->getUser());
+        $history->setPrice($item->getPrice());
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($history);
         $entityManager->flush();
+    }
+
+    private function csvImportItems(UploadedFile $csvFile)
+    {
+        $fp = fopen($csvFile, "r");
+
+        $data = array();
+
+        fgetcsv($fp, 0, "|");
+        ini_set("auto_detect_line_endings", true);
+        while ($line = fgetcsv($fp, 0, "|")){
+            $data[] = $line;
+        }
+
+        $categoryRepository = $this->getDoctrine()
+            ->getRepository(Category::class);
+        $locationRepository = $this->getDoctrine()
+            ->getRepository(Location::class);
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        foreach ($data as $row) {
+
+            if (empty($row[0]) || empty($row[1])) {
+                continue;
+            }
+            $importItem = new Item();
+            $importItem->setCategory($categoryRepository->find((int)$row[0]));
+            $importItem->setName($row[1]);
+
+            if (!empty($row[2])) {
+                $importItem->setLocation($locationRepository->find((int)$row[2]));
+            }
+            $importItem->setPrice((float)$row[3]);
+            $entityManager->persist($importItem);
+        }
+        $entityManager->flush();
+        fclose($fp);
     }
 }

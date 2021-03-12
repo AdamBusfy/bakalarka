@@ -10,6 +10,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\ItemRepository;
 use App\Repository\LocationRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -65,14 +66,15 @@ class EditItem extends AbstractType
                         $usersLocationsIds = array_map(function (Location $location) {
                             return $location->getId();
                         }, $user->getLocations()->toArray());
-                        $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
+                        if (!empty($usersLocationsIds)) {
+                            $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
+                        }
                     }
-
                     $queryBuilder->andWhere('l.isActive = 1');
-
                     return $queryBuilder;
                 }
             ])
+            ->add('price', NumberType::class)
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Edit',
                 'attr'=> ['class' =>'btn btn-primary']

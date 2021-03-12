@@ -3,16 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Category;
-use App\Entity\Item;
 use App\Form\AddCategory;
 use App\Form\Category\Filter;
 use App\Form\DeleteForm;
 use App\Form\EditCategory;
-use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
-use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -20,8 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Class CategoriesController
@@ -70,7 +65,7 @@ class CategoriesController extends AbstractController
             ])
             ->add('ancestors', TextColumn::class, [
                 'label' => 'Path',
-                'render' => function($value,Category $context) {
+                'render' => function ($value, Category $context) {
                     $links = array_reverse(
                         array_map(
                             function (Category $ancestor) {
@@ -100,9 +95,9 @@ class CategoriesController extends AbstractController
             ->add('actions', TextColumn::class, [
                 'label' => 'Actions',
                 'propertyPath' => 'id',
-                'render' => function($value, $context) {
+                'render' => function ($value, $context) {
                     $data = '<div class="text-center">';
-//                    $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_category', ['id' => $value])]);
+                    $data .= $this->renderView('layout/table/action/addChildLocation.html.twig', ['url' => $this->generateUrl('add_category_withId', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_category', ['id' => $value])]);
                     $data .= $this->renderView('layout/table/action/delete.html.twig', ['confirm' => true, 'id' => $value]);
                     $data .= "</div>";
@@ -146,14 +141,23 @@ class CategoriesController extends AbstractController
 
     /**
      * @Route("/add/category", name="add_category")
+     * @Route("/add/category/{id}", name="add_category_withId")
      * @param Request $request
      * @return Response
      */
-    public function add(Request $request): Response
+    public function add(Request $request, int $id = 0): Response
     {
 
+        $categoryRepository = $this->getDoctrine()
+            ->getRepository(Category::class);
+
+        $presetCategory = !empty($id) ? $categoryRepository->find($id) : null;
+
+
         $addCategory = new Category();
-        $addCategoryForm = $this->createForm(AddCategory::class, $addCategory);
+        $addCategoryForm = $this->createForm(AddCategory::class, $addCategory, array(
+            'presetCategory' => $presetCategory,
+        ));
         $addCategoryForm->handleRequest($request);
 
         if ($addCategoryForm->isSubmitted() && $addCategoryForm->isValid()) {

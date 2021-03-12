@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210308125021 extends AbstractMigration
+final class Version20210311145218 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -23,8 +23,8 @@ final class Version20210308125021 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('CREATE TABLE category (id INT AUTO_INCREMENT NOT NULL, parent_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, is_active TINYINT(1) NOT NULL, INDEX IDX_64C19C1727ACA70 (parent_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE history (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, category_id INT NOT NULL, location_id INT DEFAULT NULL, user_id INT NOT NULL, date_create DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, INDEX IDX_27BA704B126F525E (item_id), INDEX IDX_27BA704B12469DE2 (category_id), INDEX IDX_27BA704B64D218E (location_id), INDEX IDX_27BA704BA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, parent_id INT DEFAULT NULL, category_id INT NOT NULL, location_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, date_create DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, is_active TINYINT(1) NOT NULL, INDEX IDX_1F1B251E727ACA70 (parent_id), INDEX IDX_1F1B251E12469DE2 (category_id), INDEX IDX_1F1B251E64D218E (location_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE history (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, category_id INT NOT NULL, location_id INT DEFAULT NULL, user_id INT NOT NULL, date_create DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, price NUMERIC(8, 2) NOT NULL, INDEX IDX_27BA704B126F525E (item_id), INDEX IDX_27BA704B12469DE2 (category_id), INDEX IDX_27BA704B64D218E (location_id), INDEX IDX_27BA704BA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, parent_id INT DEFAULT NULL, category_id INT NOT NULL, location_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, date_create DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, is_active TINYINT(1) NOT NULL, price NUMERIC(8, 2) NOT NULL, INDEX IDX_1F1B251E727ACA70 (parent_id), INDEX IDX_1F1B251E12469DE2 (category_id), INDEX IDX_1F1B251E64D218E (location_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE location (id INT AUTO_INCREMENT NOT NULL, parent_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, is_active TINYINT(1) NOT NULL, INDEX IDX_5E9E89CB727ACA70 (parent_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, date_create DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, is_active TINYINT(1) NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_location (user_id INT NOT NULL, location_id INT NOT NULL, INDEX IDX_BE136DCBA76ED395 (user_id), INDEX IDX_BE136DCB64D218E (location_id), PRIMARY KEY(user_id, location_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

@@ -63,6 +63,11 @@ class Item
      */
     private $histories;
 
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     */
+    private $price = 0.00;
+
     public function __construct()
     {
         $this->date_create = new DateTime();
@@ -222,6 +227,18 @@ class Item
                 $history->setItem(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(string $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

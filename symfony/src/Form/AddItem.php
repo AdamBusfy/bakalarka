@@ -8,7 +8,9 @@ use App\Entity\Location;
 use App\Repository\CategoryRepository;
 use App\Repository\ItemRepository;
 use App\Repository\LocationRepository;
+use Omines\DataTablesBundle\Column\NumberColumn;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -55,6 +57,9 @@ class AddItem extends AbstractType
                     $queryBuilder->andWhere('l.isActive = 1');
                     return $queryBuilder;
                 }
+            ])
+            ->add('price', NumberType::class, [
+                'data' => 0.00
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',

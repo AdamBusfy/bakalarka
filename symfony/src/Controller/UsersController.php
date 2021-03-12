@@ -207,9 +207,8 @@ class UsersController extends AbstractController
                         array_map(
                             function (Location $ancestor) {
                                 return sprintf(
-                                    '<a href="../../show/location/%s"> %s</a>'
+                                    '<a> %s</a>'
                                     ,
-                                    $ancestor->getId(),
                                     $ancestor->getName()
                                 );
                             },
@@ -326,9 +325,8 @@ class UsersController extends AbstractController
                         array_map(
                             function (Location $ancestor) {
                                 return sprintf(
-                                    '<a href="../../show/location/%s"> %s</a>'
+                                    '<a> %s</a>'
                                     ,
-                                    $ancestor->getId(),
                                     $ancestor->getName()
                                 );
                             },

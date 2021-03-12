@@ -10,11 +10,84 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                {{ totalItems }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <div class="card" id="items-card">
+                <div class="card-header font-weight-bold">Items in system
+                    <div class="card-header-actions">
+                            <span class="badge bg-success">{{ totalItems }}</span>
+                        </div>
+                </div>
+                <div class="card-body">
+                    <div class="c-chart-wrapper">
+                        <canvas id="items_pie_chart" data-assigned-items="{{ assignedItems }}" data-unassigned-items="{{ unassignedItems }}" data-deleted-items="{{ deletedItems }}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card bg-gradient-dark">
+                <div class="card-header text-white font-weight-bold">
+                    Profile card
+                </div>
+                <div class="card-body">
+                    <div class="c-chart-wrapper">
+                        <div class="row">
+                            <div class="col">
+                                <div class="text-right mb-3 ">
+                                    <i class="c-icon c-icon-3xl fas fa-user-circle text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-text text-white"><strong>Name:</strong> {{ app.user.name }} </p>
+                                <p class="card-text text-white"><strong>Email:</strong> {{ app.user.email }} </p>
+                                <p class="card-text text-white"><strong>Date created:</strong> {{ app.user.dateCreate|date('d/m/Y') }}</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <div class="row">
+        <a ></a>
+        <div class="col-4">
+            <div class="card text-white bg-gradient-primary" id="location-card">
+                <div class="card-body">
+                    <div class="text-muted text-right mb-4">
+                        <i class="c-icon c-icon-2xl fas fa-location-arrow"></i>
+                    </div>
+                    <div class="text-value-lg">{{ totalLocations }}</div>
+                    <small class="text-muted text-uppercase font-weight-bold">Locations</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-white bg-gradient-warning" id="category-card">
+                <div class="card-body">
+                    <div class="text-muted text-right mb-4">
+                        <i class="c-icon c-icon-2xl fas fa-cubes"></i>
+                    </div>
+                    <div class="text-value-lg">{{ totalCategories }}</div>
+                    <small class="text-muted text-uppercase font-weight-bold">Categories</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-white bg-gradient-success" id="users-card">
+                <div class="card-body">
+                    <div class="text-muted text-right mb-4">
+                        <i class="c-icon c-icon-2xl fas fa-users"></i>
+                    </div>
+                    <div class="text-value-lg">{{ totalUsers }}</div>
+                    <small class="text-muted text-uppercase font-weight-bold">Users</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

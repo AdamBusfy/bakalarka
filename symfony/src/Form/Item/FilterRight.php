@@ -43,7 +43,9 @@ class FilterRight extends AbstractType
                         $usersLocationsIds = array_map(function (Location $location) {
                             return $location->getId();
                         }, $user->getLocations()->toArray());
-                        $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
+                        if (!empty($usersLocationsIds)) {
+                            $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
+                        }
                     }
                     $queryBuilder
                         ->andWhere('l.isActive = :active')

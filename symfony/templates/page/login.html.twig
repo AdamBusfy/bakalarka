@@ -10,87 +10,93 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10 ml-md-auto">
-                <div class="">
-                    <div class="card bg-light mb-3 mt-5" style="width: 800px;">
-                        <div class="card-body">
-                            <form class="form-horizontal" role="form" method="post">
-                                {% if error %}
-                                    <div class="alert alert-danger">
-                                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                                    </div>
-                                {% endif %} {% if app.user %}
-                                    <div class="mb-3">
-                                        You are logged in as {{ app.user.username }},
-                                        <a href="{{ path('app_logout') }}">Logout</a>
-                                    </div>
-                                {% endif %}
-                                <div class="card-header mb-3">Please sign in</div>
-                                <div class="form-group">
-                                    <label for="email" class="col-md-4 control-label"
-                                    >E-Mail Address</label
-                                    >
-                                    <div class="col-md-12">
-                                        <input
-                                                id="inputEmail"
-                                                type="email"
-                                                class="form-control"
-                                                name="email"
-                                                value="{{ last_username }}"
-                                                required
-                                                autofocus
-                                        />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password" class="col-md-4 control-label"
-                                    >Password</label
-                                    >
-                                    <div class="col-md-12">
-                                        <input
-                                                id="inputPassword"
-                                                type="password"
-                                                class="form-control"
-                                                name="password"
-                                                required
-                                        />
-                                        {#
-                                        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-                                        See https://symfony.com/doc/current/security/remember_me.html
-                                        #}
-                                        <div class="checkbox mt-3">
-                                            <label>
-                                                <input type="checkbox" name="_remember_me"> Remember me
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <input
-                                        type="hidden"
-                                        name="_csrf_token"
-                                        value="{{ csrf_token('authenticate') }}"
-                                />
-
-
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fa fa-btn fa-sign-in"></i> Login
-                                        </button>
-
-{#                                        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'auth0'}) }}" class="btn btn-primary" style="float: right">Login via Auth0</a>#}
-
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="col-md-12">
+<body class="c-app flex-row align-items-center">
+<div class="container">
+    <form class="form" role="form" method="post">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %} {% if app.user %}
+                <div class="mb-3">
+                    You are logged in as {{ app.user.username }},
+                    <a href="{{ path('app_logout') }}">Logout</a>
+                </div>
+            {% endif %}
+            <div class="card-group">
+                <div class="card p-4">
+                    <div class="card-body">
+                        <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token('authenticate') }}"
+                        />
+                        <h1>Login</h1>
+                        <p class="text-muted">Sign In to your account</p>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                <i class="c-icon fas fa-at"></i>
+                                </span>
                             </div>
+                            <input id="inputEmail"
+                                   type="email"
+                                   class="form-control"
+                                   name="email"
+                                   value="{{ last_username }}"
+                                   required
+                                   autofocus
+                                   placeholder="e-mail address"
+                            >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend"><span class="input-group-text">
+
+                                <i class="c-icon fas fa-key"></i>
+                                </span></div>
+                            <input  id="inputPassword"
+                                    type="password"
+                                    class="form-control"
+                                    name="password"
+                                    required
+                                    placeholder="password"
+                            >
+                        </div>
+{#                        <div class="checkbox">#}
+{#                            <label>#}
+{#                                <input type="checkbox" name="_remember_me"> Remember me#}
+{#                            </label>#}
+{#                        </div>#}
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn btn-primary px-4" type="submit" >Login</button>
+                            </div>
+{#                            <div class="col-6 text-right">#}
+{#                                <button class="btn btn-link px-0" type="button">Forgot password?</button>#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                </div>
+                <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
+                    <div class="card-body text-center">
+                        <div>
+                            <h2>Sign up</h2>
+                            <p>If you have no account,<br /> feel free to register now.</p>
+                            <a href="{{ path('registration') }}" class="btn btn-lg btn-outline-light mt-3"> </i>&nbsp;Register Now!</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </form>
+</div>
 {% endblock %}
+
+
+
+
+
+

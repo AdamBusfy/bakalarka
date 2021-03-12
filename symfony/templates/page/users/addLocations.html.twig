@@ -9,87 +9,112 @@
     {{ encore_entry_script_tags('page-addUserLocations') }}
 {% endblock %}
 
+{% block tabs %}
+    <ul class="nav nav-tabs mt-3" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#users-list-tab-1" role="tab">Unassigned locations</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#users-list-tab-2" role="tab">Assigned locations</a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block body %}
-    <div class="container-fluid" style="width: 95%">
+    <div class="container-fluid">
         {{ include('layout/modal/delete.html.twig') }}
 
         <div class="row">
             <div class="col">
-                <h2 class="text-secondary mb-3">Unassigned locations</h2>
-                <div class="card mt-3 bg-dark">
-                    <div class="card-header text-white">
-                        Filter
-                    </div>
-                    <div class="card-body bg-white">
-                        {{ form_start(filterLeftForm) }}
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="users-list-tab-1" role="tabpanel" aria-labelledby="home-tab">
                         <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    {{ form_row(filterLeftForm.name, {
-                                        attr: {
-                                            class: "selectpicker form-control"
-                                        }
-                                    }) }}
+                            <div class="col">
+                                <h2 class="c-header-dark mb-3">Unassigned locations</h2>
+                                <div class="card mt-3 bg-dark">
+                                    <div class="card-header text-white">
+                                        Filter
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        {{ form_start(filterLeftForm) }}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    {{ form_row(filterLeftForm.name, {
+                                                        attr: {
+                                                            class: "form-control"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                            </div>
+                                            <div class="col-3 justify-content-center align-self-center">
+                                                <div class="form-group">
+                                                    <label>&nbsp;</label>
+                                                    {{ form_row(filterLeftForm.submit, {
+                                                        label: "###ICON### apply",
+                                                        attr: {
+                                                            class: "form-control btn btn-outline-secondary btn-xs"
+                                                        }
+                                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{ form_end(filterLeftForm) }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-3">
-                            </div>
-                            <div class="col-3 justify-content-center align-self-center">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    {{ form_row(filterLeftForm.submit, {
-                                        label: "###ICON### apply",
-                                        attr: {
-                                            class: "form-control btn btn-outline-secondary btn-xs"
-                                        }
-                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
-                                </div>
+
+                                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableAdd) }}'></div>
                             </div>
                         </div>
-                        {{ form_end(filterLeftForm) }}
                     </div>
-                </div>
-
-                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableAdd) }}'></div>
-            </div>
-            <div class="col">
-                <h2 class="text-secondary mb-3">Assigned locations</h2>
-
-                <div class="card mt-3 bg-dark">
-                    <div class="card-header text-white">
-                        Filter
-                    </div>
-                    <div class="card-body bg-white">
-                        {{ form_start(filterRightForm) }}
+                    <div class="tab-pane fade" id="users-list-tab-2" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    {{ form_row(filterRightForm.name, {
-                                        attr: {
-                                            class: "selectpicker form-control"
-                                        }
-                                    }) }}
+                            <div class="col">
+                                <h2 class="c-header-dark mb-3">Assigned locations</h2>
+
+                                <div class="card mt-3 bg-dark">
+                                    <div class="card-header text-white">
+                                        Filter
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        {{ form_start(filterRightForm) }}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    {{ form_row(filterRightForm.name, {
+                                                        attr: {
+                                                            class: "form-control"
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                            </div>
+                                            <div class="col-3 justify-content-center align-self-center">
+                                                <div class="form-group">
+                                                    <label>&nbsp;</label>
+                                                    {{ form_row(filterRightForm.submit, {
+                                                        label: "###ICON### apply",
+                                                        attr: {
+                                                            class: "form-control btn btn-outline-secondary btn-xs"
+                                                        }
+                                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{ form_end(filterRightForm) }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-3">
-                            </div>
-                            <div class="col-3 justify-content-center align-self-center">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    {{ form_row(filterRightForm.submit, {
-                                        label: "###ICON### apply",
-                                        attr: {
-                                            class: "form-control btn btn-outline-secondary btn-xs"
-                                        }
-                                    }) | replace({"###ICON###": "<span class='fa fa-filter'></span>"}) | raw }}
-                                </div>
+                                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableRemove) }}'></div>
                             </div>
                         </div>
-                        {{ form_end(filterRightForm) }}
                     </div>
                 </div>
-                <div class="mt-3" data-data-table data-options='{{ datatable_settings(datatableRemove) }}'></div>
             </div>
         </div>
-    </div>
+
+
+        </div>
 {% endblock %}

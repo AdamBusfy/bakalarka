@@ -13,7 +13,7 @@ class AddUserLocation extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('submitButton', SubmitType::class, [
-                'label' => '<i class="fa fa-plus"></i>',
+                'label' => '<i class="c-icon fas fa-plus"></i>',
                 'label_html' => true,
                 'attr'=> ['class' =>'btn btn-success btn-sm', 'style=> display:inline-block'],
             ]);
