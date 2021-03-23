@@ -38,7 +38,8 @@
                                 {{ form_row(addItemForm.parent, {
                                     attr: {
                                         class: "form-control selectpicker w-100",
-                                        "data-live-search": "true"
+                                        "data-live-search": "true",
+                                        "data-api-url": selectApiUrlItems
                                     }
                                 }) }}
                             </div>
@@ -46,7 +47,8 @@
                                 {{ form_row(addItemForm.location, {
                                     attr: {
                                         class: "form-control selectpicker w-100",
-                                        "data-live-search": "true"
+                                        "data-live-search": "true",
+                                        "data-api-url": selectApiUrlLocations
                                     }
                                 }) }}
                             </div>
@@ -54,7 +56,8 @@
                                 {{ form_row(addItemForm.category, {
                                     attr: {
                                         class: "form-control selectpicker w-100",
-                                        "data-live-search": "true"
+                                        "data-live-search": "true",
+                                        "data-api-url": selectApiUrlCategories
                                     }
                                 }) }}
                             </div>

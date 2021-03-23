@@ -25,13 +25,6 @@ class AddCategory extends AbstractType
                 'choice_label' => 'name',
                 'data' => $category,
                 'required' => false,
-                'query_builder' => function (CategoryRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('c')
-                        ->from(Category::class, 'c');
-                    $queryBuilder->andWhere('c.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',

@@ -22,13 +22,6 @@ class EditLocation extends AbstractType
                 'class' => Location::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (LocationRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('l')
-                        ->from(Location::class, 'l');
-                    $queryBuilder->andWhere('l.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Edit',

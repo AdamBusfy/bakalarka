@@ -34,37 +34,11 @@ class FilterRight extends AbstractType
                 'class' => Location::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (LocationRepository $repository) use ($user, $isAdmin) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('l')
-                        ->from(Location::class, 'l');
-
-                    if (!$isAdmin) {
-                        $usersLocationsIds = array_map(function (Location $location) {
-                            return $location->getId();
-                        }, $user->getLocations()->toArray());
-                        if (!empty($usersLocationsIds)) {
-                            $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
-                        }
-                    }
-                    $queryBuilder
-                        ->andWhere('l.isActive = :active')
-                        ->setParameter('active', 1);
-
-                    return $queryBuilder;
-                }
             ])
             ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (CategoryRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('c')
-                        ->from(Category::class, 'c');
-                    $queryBuilder->andWhere('c.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('startDateTime', TextType::class, [
                 'attr' => [

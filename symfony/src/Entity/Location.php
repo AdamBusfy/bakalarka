@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=LocationRepository::class)
  */
-class Location
+class Location implements TreeNodeInterface
 {
     /**
      * @ORM\Id
@@ -233,5 +233,27 @@ class Location
         }
 
         return $this;
+    }
+
+    public function getTreeNodeParent(): ?TreeNodeInterface
+    {
+        return $this->getParent();
+    }
+
+    /**
+     * @return TreeNodeInterface[]
+     */
+    public function getTreeNodeChildren(): array
+    {
+        return $this->getChildren()->toArray();
+    }
+
+    public function isEqualToTreeNode(TreeNodeInterface $node): bool
+    {
+        if (!$node instanceof Location) {
+            return false;
+        }
+
+        return $this->id === $node->getId();
     }
 }

@@ -26,13 +26,6 @@ class AddLocation extends AbstractType
                 'choice_label' => 'name',
                 'data' => $location,
                 'required' => false,
-                'query_builder' => function (LocationRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('l')
-                        ->from(Location::class, 'l')
-                        ->andWhere('l.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('submitButton', SubmitType::class, [
                 'label'=>'Add',

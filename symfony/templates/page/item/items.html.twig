@@ -18,13 +18,31 @@
             <a class="nav-link" data-toggle="tab" href="#items-list-tab-2" role="tab">Assigned items</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#items-list-tab-3" role="tab">Import / Export items</a>
+            <a class="nav-link" data-toggle="tab" href="#items-list-tab-3" role="tab">Import / Export</a>
         </li>
     </ul>
 {% endblock %}
 
 {% block body %}
     <div class="container-fluid">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+
         {{ include('layout/modal/addItemToLocation.html.twig') }}
         {{ include('layout/modal/removeItemFromLocation.html.twig') }}
         {{ include('layout/modal/delete.html.twig') }}
@@ -41,7 +59,8 @@
                                     <div class="col">
                                         {% if is_granted('ROLE_ADMIN') %}
                                             <div>
-                                                <a href="{{ path('add_item') }}" type="button" class="btn btn-success btn-lg"><span
+                                                <a href="{{ path('add_item') }}" type="button"
+                                                   class="btn btn-success btn-lg"><span
                                                             class="c-icon fas fa-plus"></span> Add new item </a>
                                             </div>
 
@@ -71,7 +90,8 @@
                                                     {{ form_row(filterForm_left.category, {
                                                         attr: {
                                                             class: "selectpicker form-control",
-                                                            "data-live-search": "true"
+                                                            "data-live-search": "true",
+                                                            "data-api-url": selectApiUrlCategories
                                                         }
                                                     }) }}
                                                 </div>
@@ -151,7 +171,9 @@
                                                     {{ form_row(filterForm_right.location, {
                                                         attr: {
                                                             class: "selectpicker form-control",
-                                                            "data-live-search": "true"
+                                                            "data-live-search": "true",
+                                                            "data-api-url": selectApiUrlLocations
+
                                                         }
                                                     }) }}
                                                 </div>
@@ -161,7 +183,8 @@
                                                     {{ form_row(filterForm_right.category, {
                                                         attr: {
                                                             class: "selectpicker form-control",
-                                                            "data-live-search": "true"
+                                                            "data-live-search": "true",
+                                                            "data-api-url": selectApiUrlCategories
                                                         }
                                                     }) }}
                                                 </div>
@@ -213,17 +236,11 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="items-list-tab-3" role="tabpanel">
-                        <div class="row">
-                            <div class="col">
-                                <a href="{{ path('export_csv') }}" type="button"
-                                   class="btn btn-dark btn-lg"><span
-                                            class="c-icon fas fa-plus"></span> Export to csv </a>
-                            </div>
-                            <div class="col">
+                        <div class="card">
+                            <h5 class="card-header">Import items with .csv</h5>
+                            <div class="card-body">
                                 {{ form_start(uploadCsvFileForm) }}
                                 <div class="form-group">
-                                    <label for="exampleFormControlFile1">Import items</label>
-
                                     <div class="mb-2">
                                         {{ form_row(uploadCsvFileForm.file) }}
 
@@ -231,11 +248,20 @@
 
                                     {{ form_row(uploadCsvFileForm.submit, {
                                         attr: {
-                                            class: "btn-primary"
+                                            class: "btn btn-primary"
                                         }
                                     }) }}
                                 </div>
                                 {{ form_end(uploadCsvFileForm) }}
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h5 class="card-header">Export items</h5>
+                            <div class="card-body">
+                                <a href="{{ path('export_items_csv') }}" type="button"
+                                   class="btn btn-dark"><span
+                                            class="c-icon fas fa-file-download"></span> Export to csv </a>
                             </div>
                         </div>
                     </div>

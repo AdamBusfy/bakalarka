@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Item;
 use App\Entity\Location;
 use App\Entity\User;
 use App\Form\AddUserLocation;
 use App\Form\DeleteForm;
 use App\Form\Users\Filter;
 use App\Form\RemoveUserLocation;
+use App\PDF;
 use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\FetchJoinORMAdapter;
@@ -21,6 +23,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use function Clue\StreamFilter\fun;
 
@@ -54,6 +57,7 @@ class UsersController extends AbstractController
                 $deleteUser->setIsActive(false);
                 $entityManager->persist($deleteUser);
                 $entityManager->flush();
+                $this->addFlash('success', 'User successfully deleted!');
                 return $this->redirectToRoute('users');
 
             }
@@ -184,6 +188,7 @@ class UsersController extends AbstractController
                 $this->addLocations($addLocation, $user);
             }
 
+            $this->addFlash('success', 'Location successfully assigned to user!');
             return $this->redirect($request->getUri());
         }
 
@@ -302,6 +307,7 @@ class UsersController extends AbstractController
                 $this->removeLocations($removeLocation, $user);
             }
 
+            $this->addFlash('success', 'Location successfully removed from user!');
             return $this->redirectToRoute('user_add_locations', array('id' => $id));
         }
 
@@ -394,6 +400,57 @@ class UsersController extends AbstractController
             'filterLeftForm' => $filterLeftForm->createView(),
             'filterRightForm' => $filterRightForm->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/export/users/csv/", name="export_users_csv")
+     * @param Request $request
+     * @return Response
+     */
+    public function exportData(Request $request): Response
+    {
+        $allUsers = $this->getDoctrine()
+            ->getRepository(User::class)->findAll();
+
+        $response = new StreamedResponse();
+
+        $pdf = new PDF();
+        $pdf->AddPage();
+        $pdf->SetFont('Arial','B',9);
+
+        foreach ($allUsers as $user) {
+            $pdf->Cell(40,5,'Username: ' . $user->getName() . "   Mail: " . $user->getEmail());
+            $pdf->Ln();
+            $pdf->Cell(40,5,"Managed locations   " );
+            $pdf->Ln();
+
+            $pdf->BasicTable(
+                ['id', 'name'],
+                array_map(function (Location $location) {
+                    return [
+                        $location->getId(),
+                        $location->getName()
+                    ];
+                }, $user->getLocations()->toArray())
+            );
+            $pdf->Cell(40, 20);
+            $pdf->Ln();
+        }
+
+        $pdf->Output();
+
+        $response->setCallback(
+            function () use ($pdf) {
+                $handle = fopen('php://output', 'r+');
+                    $data = $pdf;
+                fclose($handle);
+            }
+        );
+
+        $response->headers->set('Content-Type', 'application/force-download');
+        $response->headers->set('Content-Disposition', 'attachment; filename="export.pdf"');
+
+        return $response;
     }
 
 

@@ -234,4 +234,13 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function isEqualToTreeNode(TreeNodeInterface $node): bool
+    {
+        if (!$node instanceof User) {
+            return false;
+        }
+
+        return $this->id === $node->getId();
+    }
 }

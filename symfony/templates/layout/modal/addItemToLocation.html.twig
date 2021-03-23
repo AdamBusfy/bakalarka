@@ -10,10 +10,13 @@
                 </button>
             </div>
             <div class="modal-body">
+
                 {{ form_row(addItemToLocationForm.location,  {
                     attr: {
-                        class: "selectpicker form-control",
-                        "data-live-search": "true"
+                        class: "selectpicker form-control w-100",
+                        "data-live-search": "true",
+                        "data-api-url": selectApiUrlLocations,
+                        "data-dropdown-parent-selector": "#add-item-to-location-modal"
                     }
                 }) }}
             </div>

@@ -114,6 +114,7 @@
       <path value="$PROJECT_DIR$/symfony/vendor/knplabs/knp-components" />
       <path value="$PROJECT_DIR$/symfony/vendor/symfony/translation" />
       <path value="$PROJECT_DIR$/symfony/vendor/omines/datatables-bundle" />
+      <path value="$PROJECT_DIR$/symfony/vendor/setasign/fpdf" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.2" />

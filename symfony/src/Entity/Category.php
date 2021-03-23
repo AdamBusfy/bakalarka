@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CategoryRepository::class)
  */
-class Category
+class Category implements TreeNodeInterface
 {
     /**
      * @ORM\Id
@@ -205,15 +205,37 @@ public function addHistory(History $history): self
     return $this;
 }
 
-public function removeHistory(History $history): self
-{
-    if ($this->histories->removeElement($history)) {
-        // set the owning side to null (unless already changed)
-        if ($history->getCategory() === $this) {
-            $history->setCategory(null);
+    public function removeHistory(History $history): self
+    {
+        if ($this->histories->removeElement($history)) {
+            // set the owning side to null (unless already changed)
+            if ($history->getCategory() === $this) {
+                $history->setCategory(null);
+            }
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function getTreeNodeParent(): ?TreeNodeInterface
+    {
+        return $this->getParent();
+    }
+
+    /**
+     * @return TreeNodeInterface[]
+     */
+    public function getTreeNodeChildren(): array
+    {
+        return $this->getChildren()->toArray();
+    }
+
+    public function isEqualToTreeNode(TreeNodeInterface $node): bool
+    {
+        if (!$node instanceof Category) {
+            return false;
+        }
+
+        return $this->id === $node->getId();
+    }
 }

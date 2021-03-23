@@ -15,6 +15,7 @@ use App\Form\Item\FilterDeletedItems;
 use App\Form\Item\FilterLeft;
 use App\Form\Item\FilterRight;
 use App\Form\RemoveItemFromLocation;
+use App\Service\TreeNode\CycleDetector;
 use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\FetchJoinORMAdapter;
@@ -23,11 +24,8 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\NumberColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
-use Omines\DataTablesBundle\DataTable;
 use Omines\DataTablesBundle\DataTableFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,6 +55,9 @@ class ItemsController extends AbstractController
         if ($uploadCsvFileForm->isSubmitted() && $uploadCsvFileForm->isValid()) {
             $csvFile = $uploadCsvFileForm->get('file')->getData();
             $this->csvImportItems($csvFile);
+
+            $this->addFlash('success', 'Items successfully imported!');
+            $this->getDoctrine()->getManager()->flush();
         }
 
         $addItemToLocationForm = $this->createForm(AddItemToLocation::class, null, ['csrf_protection' => false, 'user' => $this->getUser()]);
@@ -74,6 +75,8 @@ class ItemsController extends AbstractController
                 $this->editChildren($itemAdd, $addItemToLocationForm->get('location')->getData());
                 $this->addToHistory($itemAdd);
 
+                $this->getDoctrine()->getManager()->flush();
+                $this->addFlash('success', 'Item successfully attached to location!');
                 return $this->redirect($request->getUri());
             }
         }
@@ -91,6 +94,10 @@ class ItemsController extends AbstractController
             if (!empty($itemRemove)) {
                 $this->editChildren($itemRemove, null);
                 $this->addToHistory($itemRemove);
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $this->addFlash('success', 'Item successfully removed from location!');
                 return $this->redirect($request->getUri());
             }
         }
@@ -109,6 +116,9 @@ class ItemsController extends AbstractController
             if (!empty($deleteItem)) {
                 $this->deleteItem($deleteItem);
             }
+            $this->getDoctrine()->getManager()->flush();
+            $this->addFlash('success', 'Item successfully deleted!');
+
         }
 
         $usersLocations = $this->getUser()->getLocations()->toArray();
@@ -453,7 +463,6 @@ class ItemsController extends AbstractController
                                 $builder->andWhere('1 = 2');
                             }
                         }
-
                     },
                     new SearchCriteriaProvider()
                 ]
@@ -472,7 +481,9 @@ class ItemsController extends AbstractController
             'addItemToLocationForm' => $addItemToLocationForm->createView(),
             'removeItemFromLocationForm' => $removeItemFromLocationForm->createView(),
             'form' => $deleteItemForm->createView(),
-            'uploadCsvFileForm' => $uploadCsvFileForm->createView()
+            'uploadCsvFileForm' => $uploadCsvFileForm->createView(),
+            'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
+            'selectApiUrlCategories' => $this->generateUrl('api_select_categories'),
         ]);
     }
 
@@ -494,18 +505,30 @@ class ItemsController extends AbstractController
                 $item->setLocation($addItemForm->get('parent')->getData()->getLocation());
             }
 
+            $cycleDetector = new CycleDetector();
+
+            if ($cycleDetector->containsCycle($item)) {
+                $this->addFlash('danger', 'Item not added due to hierarchy cycle');
+                return $this->redirectToRoute('items');
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($item);
 
             $this->addToHistory($item);
 
 //            $entityManager->persist($history);
-//            $entityManager->flush();
-            return $this->redirect($request->getUri());
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Item successfully added!');
+            return $this->redirectToRoute('items');
         }
 
         return $this->render('page/item/add.html.twig', [
-            'addItemForm' => $addItemForm->createView()
+            'addItemForm' => $addItemForm->createView(),
+            'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
+            'selectApiUrlCategories' => $this->generateUrl('api_select_categories'),
+            'selectApiUrlItems' => $this->generateUrl('api_select_items'),
         ]);
     }
 
@@ -644,6 +667,12 @@ class ItemsController extends AbstractController
 
                 $editItem->setParent($editItemForm->get('parent')->getData());
 
+                $cycleDetector = new CycleDetector();
+
+                if ($cycleDetector->containsCycle($editItem)) {
+                    echo "nemozes"; exit;
+                }
+
                 $locationToSet = $editItem->getLocation();
                 if (!empty($editItemForm->get('parent')->getData())) {
                     $locationToSet = $editItemForm->get('parent')->getData()->getLocation();
@@ -651,18 +680,23 @@ class ItemsController extends AbstractController
 
                 $this->editChildren($editItem, $locationToSet);
 
-                return $this->redirect($request->getUri());
+                $this->getDoctrine()->getManager()->flush();
+                $this->addFlash('success', 'Item successfully edited!');
+                return $this->redirectToRoute('items');
             }
         }
 
         return $this->render('page/item/edit.html.twig', [
             'editItemForm' => $editItemForm->createView(),
-            'editItem' => $editItem
+            'editItem' => $editItem,
+            'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
+            'selectApiUrlCategories' => $this->generateUrl('api_select_categories'),
+            'selectApiUrlItems' => $this->generateUrl('api_select_items'),
         ]);
     }
 
     /**
-     * @Route("/export/csv/", name="export_csv")
+     * @Route("/export/items/csv/", name="export_items_csv")
      * @param Request $request
      * @return Response
      */
@@ -797,7 +831,6 @@ class ItemsController extends AbstractController
 
     private function editChildren(Item $item, Location $location = null)
     {
-
         $entityManager = $this->getDoctrine()->getManager();
 
         $item->setLocation($location);
@@ -810,7 +843,6 @@ class ItemsController extends AbstractController
             }
         }
         $entityManager->persist($item);
-        $entityManager->flush();
     }
 
     private function deleteItem(Item $item)
@@ -825,7 +857,7 @@ class ItemsController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($item);
-        $entityManager->flush();
+//        $entityManager->flush();
     }
 
     private function addToHistory(Item $item)
@@ -839,7 +871,6 @@ class ItemsController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($history);
-        $entityManager->flush();
     }
 
     private function csvImportItems(UploadedFile $csvFile)
@@ -875,8 +906,9 @@ class ItemsController extends AbstractController
             }
             $importItem->setPrice((float)$row[3]);
             $entityManager->persist($importItem);
+            $this->addToHistory($importItem);
         }
-        $entityManager->flush();
+//        $entityManager->flush();
         fclose($fp);
     }
 }

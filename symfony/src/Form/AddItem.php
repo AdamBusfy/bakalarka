@@ -26,37 +26,16 @@ class AddItem extends AbstractType
                 'class' => Item::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (ItemRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('i')
-                        ->from(Item::class, 'i');
-                    $queryBuilder->andWhere('i.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('category', EntityTreeType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'required' => true,
-                'query_builder' => function (CategoryRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('c')
-                        ->from(Category::class, 'c');
-                    $queryBuilder->andWhere('c.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('location', EntityTreeType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (LocationRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('l')
-                        ->from(Location::class, 'l');
-                    $queryBuilder->andWhere('l.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('price', NumberType::class, [
                 'data' => 0.00

@@ -7,6 +7,7 @@ use App\Form\AddCategory;
 use App\Form\Category\Filter;
 use App\Form\DeleteForm;
 use App\Form\EditCategory;
+use App\Service\TreeNode\CycleDetector;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
@@ -48,6 +49,7 @@ class CategoriesController extends AbstractController
             if (!empty($deleteCategory)) {
                 $this->deleteCategory($deleteCategory);
             }
+            $this->addFlash('success', 'Location successfully deleted!');
             return $this->redirect($request->getUri());
         }
 
@@ -164,12 +166,22 @@ class CategoriesController extends AbstractController
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($addCategory);
+
+            $cycleDetector = new CycleDetector();
+
+            if ($cycleDetector->containsCycle($addCategory)) {
+                $this->addFlash('danger', 'Category not added due to hierarchy cycle');
+                return $this->redirectToRoute('categories');
+            }
+
             $entityManager->flush();
+            $this->addFlash('success', 'Category successfully created!');
             return $this->redirectToRoute('categories');
         }
 
         return $this->render('page/category/add.html.twig', [
             'addCategoryForm' => $addCategoryForm->createView(),
+            'selectApiUrlCategories' => $this->generateUrl('api_select_categories'),
         ]);
     }
 
@@ -203,15 +215,25 @@ class CategoriesController extends AbstractController
                 }
 
                 $editCategory->setParent($editCategoryForm->get('parent')->getData());
+                $this->getDoctrine()->getManager()->persist($editCategory);
 
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->flush();
-                return $this->redirect($request->getUri());
+                $cycleDetector = new CycleDetector();
+
+                if ($cycleDetector->containsCycle($editCategory)) {
+                    $this->addFlash('danger', 'Category not edited due to hierarchy cycle');
+                    return $this->redirectToRoute('categories');
+                }
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $this->addFlash('success', 'Category successfully edited!');
+                return $this->redirectToRoute('categories');
             }
         }
 
         return $this->render('page/category/edit.html.twig', [
             'editCategoryForm' => $editCategoryForm->createView(),
+            'selectApiUrlCategories' => $this->generateUrl('api_select_categories'),
         ]);
     }
 

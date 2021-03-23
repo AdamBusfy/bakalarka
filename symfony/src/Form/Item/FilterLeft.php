@@ -25,13 +25,6 @@ class FilterLeft extends AbstractType
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'query_builder' => function (CategoryRepository $repository) {
-                    $queryBuilder = $repository->createQueryBuilder('qb')
-                        ->select('c')
-                        ->from(Category::class, 'c');
-                    $queryBuilder->andWhere('c.isActive = 1');
-                    return $queryBuilder;
-                }
             ])
             ->add('startDateTime', TextType::class, [
                 'attr' => [

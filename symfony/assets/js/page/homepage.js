@@ -4,6 +4,10 @@ import Chart from 'chart.js';
 // const canvas = document.getElementById('canvas');
 // const context = canvas.createContext('2d');
 
+// document.getElementById("items-card").addEventListener('click', event => {
+//     location.href = event.currentTarget.dataset.redirectUrl;
+// });
+
 document.getElementById("items-card").onclick = function () {
     location.href = "/items";
 };

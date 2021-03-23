@@ -12,8 +12,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
  */
-class Item
+class Item implements TreeNodeInterface
 {
+//    const STATE_ACTIVE = 1;
+//    const STATE_INACTIVE = 2;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -241,5 +244,27 @@ class Item
         $this->price = $price;
 
         return $this;
+    }
+
+    public function getTreeNodeParent(): ?TreeNodeInterface
+    {
+        return $this->getParent();
+    }
+
+    /**
+     * @return TreeNodeInterface[]
+     */
+    public function getTreeNodeChildren(): array
+    {
+        return $this->getChildren()->toArray();
+    }
+
+    public function isEqualToTreeNode(TreeNodeInterface $node): bool
+    {
+        if (!$node instanceof Item) {
+            return false;
+        }
+
+        return $this->id === $node->getId();
     }
 }

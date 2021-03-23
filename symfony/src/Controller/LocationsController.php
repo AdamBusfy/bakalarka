@@ -9,6 +9,7 @@ use App\Form\AddLocation;
 use App\Form\Location\Filter;
 use App\Form\DeleteForm;
 use App\Form\EditLocation;
+use App\Service\TreeNode\CycleDetector;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
@@ -51,6 +52,7 @@ class LocationsController extends AbstractController
             if (!empty($deleteLocation)) {
                 $this->deleteLocation($deleteLocation);
             }
+            $this->addFlash('success', 'Location successfully deleted!');
         }
 
         $filterForm = $this->createForm(Filter::class, null, ['csrf_protection' => false]);
@@ -165,12 +167,23 @@ class LocationsController extends AbstractController
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($addLocation);
+
+            $cycleDetector = new CycleDetector();
+
+            if ($cycleDetector->containsCycle($addLocation)) {
+                $this->addFlash('danger', 'Location not added due to hierarchy cycle');
+                return $this->redirectToRoute('locations');
+            }
+
             $entityManager->flush();
+
+            $this->addFlash('success', 'Location successfully created!');
             return $this->redirectToRoute('locations');
         }
 
         return $this->render('page/location/add.html.twig', [
             'addLocationForm' => $addLocationForm->createView(),
+            'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
         ]);
     }
 
@@ -204,14 +217,23 @@ class LocationsController extends AbstractController
 
                 $editLocation->setParent($editLocationForm->get('parent')->getData());
 
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->flush();
-                return $this->redirect($request->getUri());
+                $cycleDetector = new CycleDetector();
+
+                if ($cycleDetector->containsCycle($editLocation)) {
+                    $this->addFlash('danger', 'Location not edited due to hierarchy cycle');
+                    return $this->redirectToRoute('locations');
+                }
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $this->addFlash('success', 'Location successfully edited!');
+                return $this->redirectToRoute('locations');
             }
         }
 
         return $this->render('page/location/edit.html.twig', [
             'editLocationForm' => $editLocationForm->createView(),
+            'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
         ]);
     }
 

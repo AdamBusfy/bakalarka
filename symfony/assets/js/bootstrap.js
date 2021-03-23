@@ -24,13 +24,34 @@ import '@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.css'
 
 $('.datepicker').datepicker();
 
-$('.selectpicker').select2({
-    theme: 'bootstrap4'
-});
+$('.selectpicker').each(function() {
+    const url = $(this).attr("data-api-url");
+    const parentSelector = $(this).attr('data-dropdown-parent-selector');
 
-// $('.input-daterange input').each(function() {
-//     $(this).datepicker('clearDates');
-// });
+    let options = {
+        theme: 'bootstrap4'
+    };
+
+    if (url !== undefined) {
+        options = {
+            ...options,
+            theme: 'bootstrap4',
+            ajax: {
+                url: url,
+                dataType: 'json'
+            }
+        };
+    }
+
+    if (parentSelector !== undefined) {
+        options = {
+            ...options,
+            dropdownParent: $(parentSelector)
+        };
+    }
+
+    $(this).select2(options);
+});
 
 $("[data-data-table]").each((_index, table) => {
     const options = JSON.parse(table.dataset.options);
@@ -41,3 +62,7 @@ $("[data-data-table]").each((_index, table) => {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
     });
 });
+
+setTimeout(function() {
+    $('.alert').fadeOut('fast');
+}, 5000);
