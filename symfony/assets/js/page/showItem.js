@@ -1,6 +1,8 @@
 import '../bootstrap.js';
 
 import Chart from 'chart.js';
+import $ from "jquery";
+
 
 var historyPrices = document.getElementById('price_history').getAttribute('data-price-history');
 

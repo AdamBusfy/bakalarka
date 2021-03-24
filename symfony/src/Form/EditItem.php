@@ -37,7 +37,7 @@ class EditItem extends AbstractType
                     $queryBuilder = $repository->createQueryBuilder('qb')
                         ->select('i')
                         ->from(Item::class, 'i');
-                    $queryBuilder->where('i.isActive = 1');
+                    $queryBuilder->where('i.state = 1');
                     return $queryBuilder;
                 }
             ])

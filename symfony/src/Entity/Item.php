@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use App\Service\TreeNode\TreeNodeInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,8 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Item implements TreeNodeInterface
 {
-//    const STATE_ACTIVE = 1;
-//    const STATE_INACTIVE = 2;
+    const STATE_INACTIVE = 0;
+    const STATE_ACTIVE = 1;
+    const STATE_DISCARDED = 2;
 
     /**
      * @ORM\Id
@@ -57,9 +59,9 @@ class Item implements TreeNodeInterface
     private $location;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="integer")
      */
-    private $isActive = true;
+    private $state = 1;
 
     /**
      * @ORM\OneToMany(targetEntity=History::class, mappedBy="item", orphanRemoval=true)
@@ -70,6 +72,11 @@ class Item implements TreeNodeInterface
      * @ORM\Column(type="decimal", precision=8, scale=2)
      */
     private $price = 0.00;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $discard_reason;
 
     public function __construct()
     {
@@ -192,14 +199,14 @@ class Item implements TreeNodeInterface
         return $ancestors;
     }
 
-    public function getIsActive(): ?bool
+    public function getState(): ?int
     {
-        return $this->isActive;
+        return $this->state;
     }
 
-    public function setIsActive(bool $isActive): self
+    public function setState(int $state): self
     {
-        $this->isActive = $isActive;
+        $this->state = $state;
 
         return $this;
     }
@@ -266,5 +273,17 @@ class Item implements TreeNodeInterface
         }
 
         return $this->id === $node->getId();
+    }
+
+    public function getDiscardReason(): ?string
+    {
+        return $this->discard_reason;
+    }
+
+    public function setDiscardReason(?string $discard_reason): self
+    {
+        $this->discard_reason = $discard_reason;
+
+        return $this;
     }
 }

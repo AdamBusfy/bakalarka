@@ -32,21 +32,27 @@ class HomePageController extends AbstractController
         $repoUsers = $em->getRepository(User::class);
 
         $assignedItems = $repoItems->createQueryBuilder('i')
-            ->where('i.isActive = 1')
+            ->where('i.state = 1')
             ->andWhere('i.location IS NOT NULL')
             ->select('count(i.id)')
             ->getQuery()
             ->getSingleScalarResult();
 
         $unassignedItems = $repoItems->createQueryBuilder('i')
-            ->where('i.isActive = 1')
+            ->where('i.state = 1')
             ->andWhere('i.location IS NULL')
             ->select('count(i.id)')
             ->getQuery()
             ->getSingleScalarResult();
 
         $deletedItems = $repoItems->createQueryBuilder('i')
-            ->where('i.isActive = 0')
+            ->where('i.state = 0')
+            ->select('count(i.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $discardedItems = $repoItems->createQueryBuilder('i')
+            ->where('i.state = 2')
             ->select('count(i.id)')
             ->getQuery()
             ->getSingleScalarResult();
@@ -78,6 +84,7 @@ class HomePageController extends AbstractController
         return $this->render('page/homepage.html.twig', [
             'assignedItems' => $assignedItems,
             'deletedItems' => $deletedItems,
+            'discardedItems' => $discardedItems,
             'unassignedItems' => $unassignedItems,
             'totalItems' => $totalItems,
             'totalLocations' => $totalLocations,

@@ -35,7 +35,7 @@
                                     |raw }}</p>
                                 <p class="card-text">
                                     <strong>Category :</strong>
-                                    {% if item.getIsActive() == 1 %}
+                                    {% if item.getState() == 1 %}
                                         {{ item.getCategory().getName() }}
                                     {% else %}
                                         &nbsp;
@@ -43,7 +43,7 @@
                                 </p>
                                 <p class="card-text">
                                     <strong>Location :</strong>
-                                    {% if item.getIsActive() == 1 %}
+                                    {% if item.getState() == 1 %}
                                         {{ item.getLocation() ? item.getLocation().getName() : "empty location" }}
                                     {% else %}
                                         &nbsp;
@@ -62,16 +62,17 @@
                                 <p class="card-text">
                                     <strong>State :</strong>
 
-                                    {% if item.getIsActive() == 1 %}
-                                        <a class="text-success">Active</a>
-                                    {% else %}
+                                    {% if item.getState() == 1 %}
+                                        <a class="text-success" data-toggle data-placement="right" title="Tooltip on right">Active</a>
+                                    {% elseif item.getState() == 0 %}
                                         <a class="text-danger">Deleted</a>
+                                    {% elseif item.getState() == 2 %}
+                                        <a class="text-warning" data-toggle="popover" title="Discard reason" data-trigger="hover" data-content="{{ item.getDiscardReason() }}"> Discarded</a>
                                     {% endif %}
-
                                 </p>
 
                                 <p class="card-text">
-                                    <strong>Date created :</strong> {{ item.getDateCreate()|date('d/m/Y') }}
+                                    <strong>Date created:</strong> {{ item.getDateCreate()|date('d/m/Y') }}
                                 </p>
 
                             </div>

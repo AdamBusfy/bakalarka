@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use App\Service\TreeNode\TreeNodeInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

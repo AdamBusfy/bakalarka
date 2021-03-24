@@ -2,7 +2,7 @@
 
 namespace App\Service\TreeNode;
 
-use App\Entity\TreeNodeInterface;
+use App\Service\TreeNode\TreeNodeInterface;
 use Exception;
 
 class CycleDetector

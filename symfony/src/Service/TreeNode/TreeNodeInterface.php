@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Service\TreeNode;
 
 interface TreeNodeInterface
 {

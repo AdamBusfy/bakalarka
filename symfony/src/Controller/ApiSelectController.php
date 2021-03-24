@@ -117,7 +117,7 @@ class ApiSelectController extends AbstractController
             ->getRepository(Item::class);
 
         $items = $itemRepository->createQueryBuilder('i')
-            ->where('i.isActive = 1 ')
+            ->where('i.state = 1 ')
             ->andWhere('i.name LIKE :iname')
             ->setParameter(
                 'iname',

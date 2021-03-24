@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\Item;
 use App\Entity\Location;
 use App\Entity\User;

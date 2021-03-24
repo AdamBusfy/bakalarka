@@ -6,9 +6,11 @@ use App\Entity\Category;
 use App\Entity\History;
 use App\Entity\Item;
 use App\Entity\Location;
+use App\Entity\User;
 use App\Form\AddItem;
 use App\Form\AddItemToLocation;
 use App\Form\DeleteForm;
+use App\Form\DiscardItem;
 use App\Form\EditItem;
 use App\Form\Item\FileUpload;
 use App\Form\Item\FilterDeletedItems;
@@ -77,6 +79,30 @@ class ItemsController extends AbstractController
 
                 $this->getDoctrine()->getManager()->flush();
                 $this->addFlash('success', 'Item successfully attached to location!');
+                return $this->redirect($request->getUri());
+            }
+        }
+
+        $discardItemForm = $this->createForm(DiscardItem::class);
+        $discardItemForm->handleRequest($request);
+
+        if ($discardItemForm->isSubmitted() && $discardItemForm->isValid()) {
+            $itemRepository = $this->getDoctrine()
+                ->getRepository(Item::class);
+
+            /** @var Item $itemDiscard */
+            $itemDiscard = $itemRepository->find($discardItemForm->get('id')->getData());
+
+            if (!empty($itemDiscard)) {
+                $itemDiscard->setDiscardReason($discardItemForm->get('discardReason')->getData());
+
+                $itemDiscard->setLocation(null);
+                $itemDiscard->setState(Item::STATE_DISCARDED);
+                $this->addToHistory($itemDiscard);
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $this->addFlash('success', 'Item successfully discard!');
                 return $this->redirect($request->getUri());
             }
         }
@@ -280,7 +306,8 @@ class ItemsController extends AbstractController
                         }
 
                         $builder->andWhere('item.location IS NULL');
-                        $builder->andWhere('item.isActive = 1 ');
+                        $builder->andWhere('item.state = 1 ');
+                        $builder->orWhere('item.state = 2 ');
 
                     },
                     new SearchCriteriaProvider()
@@ -383,6 +410,7 @@ class ItemsController extends AbstractController
 
                     $data .= $this->renderView('layout/table/action/removeItemFromLocation.html.twig', ['id' => $value]);
                     $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_item', ['id' => $value])]);
+                    $data .= $this->renderView('layout/table/action/discardItem.html.twig', ['id' => $value]);
 
                     if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
                         $data .= $this->renderView('layout/table/action/edit.html.twig', ['url' => $this->generateUrl('edit_item', ['id' => $value])]);
@@ -454,7 +482,7 @@ class ItemsController extends AbstractController
                         }
 
                         $builder->andWhere('item.location IS NOT NULL');
-                        $builder->andWhere('item.isActive = 1 ');
+                        $builder->andWhere('item.state = 1 ');
 
                         if (!$isAdmin) {
                             if (!empty($usersLocationsIds)) {
@@ -480,6 +508,7 @@ class ItemsController extends AbstractController
             'filterForm_left' => $filterFormLeftTable->createView(),
             'addItemToLocationForm' => $addItemToLocationForm->createView(),
             'removeItemFromLocationForm' => $removeItemFromLocationForm->createView(),
+            'discardItemForm' => $discardItemForm->createView(),
             'form' => $deleteItemForm->createView(),
             'uploadCsvFileForm' => $uploadCsvFileForm->createView(),
             'selectApiUrlLocations' => $this->generateUrl('api_select_locations'),
@@ -755,11 +784,11 @@ class ItemsController extends AbstractController
                 'label' => "Timestamp",
                 'globalSearchable' => false
             ])
-            ->add('isActive', TextColumn::class, [
-                'field' => 'item.isActive',
+            ->add('state', TextColumn::class, [
+                'field' => 'item.state',
                 'label' => 'State',
                 'render' => function ($value, Item $context) {
-                    return $context->getIsActive() ? 'Active' : 'Deleted';
+                    return $context->getState() === Item::STATE_ACTIVE ? 'Active' : 'Deleted';
                 },
                 'orderable' => false,
             ])
@@ -810,7 +839,7 @@ class ItemsController extends AbstractController
                                 );
                         }
 
-                        $builder->andWhere('item.isActive = 0 ');
+                        $builder->andWhere('item.state = 0 ');
 
                     },
                     new SearchCriteriaProvider()
@@ -851,7 +880,7 @@ class ItemsController extends AbstractController
             $this->deleteItem($child);
         }
 
-        $item->setIsActive(false);
+        $item->setState(Item::STATE_INACTIVE);
 
         $this->addToHistory($item);
 

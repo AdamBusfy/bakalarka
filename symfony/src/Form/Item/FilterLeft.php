@@ -3,7 +3,9 @@
 namespace App\Form\Item;
 
 use App\Entity\Category;
+use App\Entity\Item;
 use App\Entity\Location;
+use App\Entity\User;
 use App\Form\EntityTreeType;
 use App\Repository\CategoryRepository;
 use Symfony\Component\Form\AbstractType;

@@ -24,6 +24,8 @@ import '@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.css'
 
 $('.datepicker').datepicker();
 
+$('[data-toggle="popover"]').popover();
+
 $('.selectpicker').each(function() {
     const url = $(this).attr("data-api-url");
     const parentSelector = $(this).attr('data-dropdown-parent-selector');
@@ -59,7 +61,19 @@ $("[data-data-table]").each((_index, table) => {
         searching: false,
         dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
             "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+    });
+});
+
+const initPopover = () => {
+    $('[data-toggle="tooltip"]').tooltip();
+};
+
+$(document).on('init.dt', event => {
+    initPopover();
+    $(event.target).on('draw.dt', () => {
+        console.log("DRAW");
+        initPopover();
     });
 });
 
