@@ -1,5 +1,6 @@
 import '../bootstrap.js';
 import Chart from 'chart.js';
+import $ from "jquery";
 
 // const canvas = document.getElementById('canvas');
 // const context = canvas.createContext('2d');
@@ -66,5 +67,9 @@ var itemsPieChart = new Chart(ctx, {
         }
     }
 });
+
+setTimeout(function() {
+    $('.alert').fadeOut('fast');
+}, 5000);
 
 console.log("HOMEPAGE");

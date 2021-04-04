@@ -30,14 +30,13 @@
                 <a class="c-sidebar-nav-link" href="{{ path('items') }}">
                     <i class="c-sidebar-nav-icon fas fa-cube"></i>
                     Items
-                    <span class="badge badge-info">NEW</span>
                 </a>
 
             </li>
             <li class="c-sidebar-nav-item">
                 <a class="c-sidebar-nav-link" href="{{ path('show_deleted_items') }}">
                     <i class="c-sidebar-nav-icon fas fa-eraser"></i>
-                    Deleted items
+                    Discarded items
                 </a>
             </li>
             {% if is_granted('ROLE_ADMIN') %}
@@ -80,9 +79,17 @@
         {% block tabs %}{% endblock %}
         {% if app.user %}
             <ul class="c-header-nav ml-auto mr-4">
+                <a class="c-header-nav-link" href="{{ path('notifications') }}"
+                   role="button">
+                    <div class="c-avatar">
+                        <i class="fas fa-bell fa-2x"></i>
+                        <span class="badge badge-pill badge-danger">{{ app.user().getUnseenNotifications().count() }}</span>
+                    </div>
+                </a>
                 <li class="c-header-nav-item dropdown">
+
                     <a class="c-header-nav-link" data-toggle="dropdown" href="#"
-                       role="button" aria-haspopup="true" aria-expanded="false">
+                       role="button">
                         <div class="c-avatar">
                             <i class="fas fa-user-tie fa-2x"></i>
                         </div>

@@ -12,9 +12,11 @@
 
 {% block body %}
     <div class="container">
+        {{ include('layout/modal/delete.html.twig') }}
+
         <div class="row">
             <div class="col">
-                <h2 class="text-secondary mb-3 text-dark">Deleted Items</h2>
+                <h2 class="text-secondary mb-3 text-dark">Discarded Items</h2>
                 <div class="card mt-3 mb-5 bg-dark">
                     <div class="card-header text-white">
                         Filter

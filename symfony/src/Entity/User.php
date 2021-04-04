@@ -62,11 +62,17 @@ class User implements UserInterface
      */
     private $histories;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Notification::class, mappedBy="user")
+     */
+    private $notifications;
+
     public function __construct()
     {
         $this->date_create = new DateTime();
         $this->locations = new ArrayCollection();
         $this->histories = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -243,5 +249,44 @@ class User implements UserInterface
         }
 
         return $this->id === $node->getId();
+    }
+
+    /**
+     * @return Collection|Notification[]
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    /**
+     */
+    public function getUnseenNotifications(): Collection
+    {
+        return $this->notifications->filter(function (Notification $notification) {
+            return $notification->getStatus() === false;
+        });
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications[] = $notification;
+            $notification->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): self
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

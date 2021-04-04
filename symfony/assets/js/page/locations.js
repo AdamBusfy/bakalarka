@@ -6,4 +6,8 @@ $(document).on('click', '[data-delete-modal-opener]', event => {
     $("#delete_form_id").val(event.currentTarget.dataset.id);
 });
 
+setTimeout(function() {
+    $('.alert').fadeOut('fast');
+}, 5000);
+
 console.log("LOCATIONS");

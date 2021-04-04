@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\History;
 use App\Entity\Item;
 use App\Entity\Location;
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Form\AddItem;
 use App\Form\AddItemToLocation;
@@ -57,7 +58,7 @@ class ItemsController extends AbstractController
         if ($uploadCsvFileForm->isSubmitted() && $uploadCsvFileForm->isValid()) {
             $csvFile = $uploadCsvFileForm->get('file')->getData();
             $this->csvImportItems($csvFile);
-
+            $this->notifyUsers(Notification::TYPE_IMPORT, "New items were imported to system !");
             $this->addFlash('success', 'Items successfully imported!');
             $this->getDoctrine()->getManager()->flush();
         }
@@ -307,8 +308,6 @@ class ItemsController extends AbstractController
 
                         $builder->andWhere('item.location IS NULL');
                         $builder->andWhere('item.state = 1 ');
-                        $builder->orWhere('item.state = 2 ');
-
                     },
                     new SearchCriteriaProvider()
                 ]
@@ -547,9 +546,12 @@ class ItemsController extends AbstractController
             $this->addToHistory($item);
 
 //            $entityManager->persist($history);
-            $entityManager->flush();
 
             $this->addFlash('success', 'Item successfully added!');
+
+            $this->notifyUsers(Notification::TYPE_DEFAULT, "New items in system !");
+
+            $entityManager->flush();
             return $this->redirectToRoute('items');
         }
 
@@ -766,6 +768,24 @@ class ItemsController extends AbstractController
      */
     public function showDeletedItems(Request $request, DataTableFactory $dataTableFactory): Response
     {
+
+        $deleteItemForm = $this->createForm(DeleteForm::class);
+        $deleteItemForm->handleRequest($request);
+
+        if ($deleteItemForm->isSubmitted() && $deleteItemForm->isValid()) {
+            $itemRepository = $this->getDoctrine()
+                ->getRepository(Item::class);
+
+            $deleteItem = $itemRepository->find($deleteItemForm->get('id')->getData());
+
+            if (!empty($deleteItem)) {
+                $this->deleteItem($deleteItem);
+            }
+            $this->getDoctrine()->getManager()->flush();
+            $this->addFlash('success', 'Item successfully deleted!');
+
+        }
+
         $filterFormDeletedItemsTable = $this->createForm(FilterDeletedItems::class, null, ['csrf_protection' => false]);
         $filterFormDeletedItemsTable->handleRequest($request);
 
@@ -788,7 +808,7 @@ class ItemsController extends AbstractController
                 'field' => 'item.state',
                 'label' => 'State',
                 'render' => function ($value, Item $context) {
-                    return $context->getState() === Item::STATE_ACTIVE ? 'Active' : 'Deleted';
+                    return $context->getState() === Item::STATE_ACTIVE ? 'Active' : 'Discarded';
                 },
                 'orderable' => false,
             ])
@@ -798,6 +818,9 @@ class ItemsController extends AbstractController
                 'render' => function ($value, $context) {
                     $data = '<div class="text-center">';
                     $data .= $this->renderView('layout/table/action/show.html.twig', ['url' => $this->generateUrl('show_item', ['id' => $value])]);
+                    if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+                        $data .= $this->renderView('layout/table/action/delete.html.twig', ['id' => $value]);
+                    }
                     $data .= "</div>";
                     return $data;
                 }
@@ -839,7 +862,7 @@ class ItemsController extends AbstractController
                                 );
                         }
 
-                        $builder->andWhere('item.state = 0 ');
+                        $builder->andWhere('item.state = 2 ');
 
                     },
                     new SearchCriteriaProvider()
@@ -852,6 +875,7 @@ class ItemsController extends AbstractController
         }
 
         return $this->render('page/item/deletedItems.html.twig', [
+            'form' => $deleteItemForm->createView(),
             'dataTableDeletedItems' => $tableDeletedItems,
             'filterDeletedItems' => $filterFormDeletedItemsTable->createView()
         ]);
@@ -939,5 +963,20 @@ class ItemsController extends AbstractController
         }
 //        $entityManager->flush();
         fclose($fp);
+    }
+
+    private function notifyUsers(int $type, string $message) {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $users = $this->getDoctrine()
+            ->getRepository(User::class)->findAll();
+
+        foreach ($users as $user) {
+            $notification = new Notification();
+            $notification->setType($type);
+            $notification->setUser($user);
+            $notification->setMessage($message);
+            $entityManager->persist($notification);
+        }
     }
 }

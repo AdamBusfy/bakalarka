@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+{% block title %}Notifications{% endblock %}
+
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('page-notifications') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('page-notifications') }}
+    {% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-9">
+
+            </div>
+            <div class="col mb-4">
+                {{ form_start(deleteAllNotifications, { attr: { class: 'd-inline-block'} }) }}
+                {{ form_row(deleteAllNotifications.submitButton) }}
+                {{ form_end(deleteAllNotifications) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if notifications is empty %}
+
+                    <div class="alert alert-dark" role="alert">
+                        There are  <a class="alert-link">no new </a> notifications.
+                    </div>
+
+                {% endif %}
+                {% for notification in notifications %}
+                    <div class="alert alert-{{ notificationTypesToBootstrapClass[notification.type] }}" role="alert">
+
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="row">
+                                    <div class="col">
+                                        <h3 class="alert-heading">{{ notification.getMessage() }}</h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p> {{ notification.getDateCreate()|date('d/m/Y H:i:s') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col" style="text-align: right; padding-top: 20px" >
+                                {% set deleteFormCurrent = deleteForm.createView() %}
+                                {{ form_start(deleteFormCurrent, { attr: { class: 'd-inline-block'} }) }}
+                                {{ form_row(deleteFormCurrent.id, { attr: { value: notification.id } }) }}
+                                {{ form_row(deleteFormCurrent.submitButton) }}
+                                {{ form_end(deleteFormCurrent) }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+
+    </div>
+{% endblock %}

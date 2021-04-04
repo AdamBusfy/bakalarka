@@ -77,6 +77,3 @@ $(document).on('init.dt', event => {
     });
 });
 
-setTimeout(function() {
-    $('.alert').fadeOut('fast');
-}, 5000);
