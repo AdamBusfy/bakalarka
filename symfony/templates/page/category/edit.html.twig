@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit category{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('page-editCategory') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('page-editCategory') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="width: 75%">
+        <div class="row">
+            <div class="col">
+                <div class="card bg-dark">
+                    <div class="card-header text-white">
+                        Edit Category
+                    </div>
+
+                    <div class="bg-white">
+
+                    {{ form_start(editCategoryForm) }}
+
+                    <ul class="list-group list-group-flush">
+
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                {{ form_row(editCategoryForm.name, {
+                                    attr: {
+                                        class: "form-control"
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_row(editCategoryForm.parent, {
+                                    attr: {
+                                        class: "form-control selectpicker w-100",
+                                        "data-live-search": "true",
+                                        "data-api-url": selectApiUrlCategories
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_row(editCategoryForm.submitButton) }}
+
+                        </li>
+                    </ul>
+                    {{ form_end(editCategoryForm) }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
