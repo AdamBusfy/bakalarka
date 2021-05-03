@@ -1,20 +1,10 @@
-# 🐳 Adam Busfy BAKALARKA
-
-## Description
-
-This is a complete stack for running Symfony 5 into Docker containers using docker-compose tool.
-
-It is composed by 3 containers:
-
-- `nginx`, acting as the webserver.
-- `php`, the PHP-FPM container with the 7.4 PHPversion.
-- `db` which is the MySQL database container with a **MySQL 8.0** image.
+# 🐳 Adam Busfy ZADANIE
 
 ## Installation
 
-1. 😀 Clone this rep.
+1. Clone this rep.
 
-2. Run `docker-compose up -d`
+2. Run `docker-compose up`
 
 3. The 3 containers are deployed: 
 
@@ -30,5 +20,9 @@ Creating symfony-docker_nginx_1 ... done
 DATABASE_URL=mysql://app_user:helloworld@db:3306/app_db?serverVersion=5.7
 ```
 
-You could change the name, user and password of the database in the `env` file at the root of the project.
+5. Open new terminal and run `docker-compose exec php sh`  
 
+6. inside run`composer install` and `php bin/console make:migration` 
+7. and also `npm install` and `npm run watch`
+
+8. Try it out! : http://127.0.0.1
