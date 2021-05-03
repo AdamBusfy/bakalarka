@@ -53,6 +53,13 @@ class UsersController extends AbstractController
             $deleteUser = $userRepository->find($deleteUserForm->get('id')->getData());
 
             if (!empty($deleteUser)) {
+                if ($isAdmin = in_array('ROLE_ADMIN', $deleteUser->getRoles())) {
+                    $this->addFlash('danger', 'You cant delete administrator!');
+
+                    return $this->redirectToRoute('users');
+
+                }
+
                 $entityManager = $this->getDoctrine()->getManager();
                 $deleteUser->setIsActive(false);
                 $entityManager->persist($deleteUser);
@@ -409,9 +416,13 @@ class UsersController extends AbstractController
      */
     public function exportData(Request $request): Response
     {
-        $allUsers = $this->getDoctrine()
-            ->getRepository(User::class)->findAll();
+        $em = $this->getDoctrine()->getManager();
+        $repoUsers = $em->getRepository(User::class);
 
+        $allUsers = $repoUsers->createQueryBuilder('u')
+            ->where('u.isActive = 1')
+            ->getQuery()
+            ->getResult();
         $response = new StreamedResponse();
 
         $pdf = new PDF();

@@ -67,7 +67,7 @@
                                     {% elseif item.getState() == 0 %}
                                         <a class="text-danger">Deleted</a>
                                     {% elseif item.getState() == 2 %}
-                                        <a class="text-warning" data-toggle="popover" title="Discard reason" data-trigger="hover" data-content="{{ item.getDiscardReason() }}"> Discarded</a>
+                                        <a class="text-warning" data-toggle="popover" title="Discard reason" data-trigger="hover" data-content="{{ item.getDiscardReason() }}"> Discarded <i class="fas fa-question-circle text-dark"></i></a>
                                     {% endif %}
                                 </p>
 

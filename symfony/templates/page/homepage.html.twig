@@ -14,14 +14,22 @@
     <div class="row">
         <div class="col-6">
             <div class="card" id="items-card">
-                <div class="card-header font-weight-bold">Items in system
+                <div class="card-header font-weight-bold">Total Items in system
                     <div class="card-header-actions">
                             <span class="badge bg-success">{{ totalItems }}</span>
                         </div>
                 </div>
                 <div class="card-body">
                     <div class="c-chart-wrapper">
-                        <canvas id="items_pie_chart" data-assigned-items="{{ assignedItems }}" data-unassigned-items="{{ unassignedItems }}" data-deleted-items="{{ deletedItems }}" data-discarded-items="{{ discardedItems }}"></canvas>
+                        <canvas id="items_pie_chart" data-assigned-items="{% if is_granted('ROLE_ADMIN') %}
+
+                                    {{ assignedItems }}
+
+                                {% else %}
+
+                                    {{ managedItems }}
+
+                                {% endif %}" data-unassigned-items="{{ unassignedItems }}" data-deleted-items="{{ deletedItems }}" data-discarded-items="{{ discardedItems }}"></canvas>
                     </div>
                 </div>
             </div>
@@ -53,15 +61,20 @@
         </div>
     </div>
     <div class="row">
-        <a ></a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+
         <div class="col-4">
             <div class="card text-white bg-gradient-primary" id="location-card">
                 <div class="card-body">
                     <div class="text-muted text-right mb-4">
                         <i class="c-icon c-icon-2xl fas fa-location-arrow"></i>
                     </div>
-                    <div class="text-value-lg">{{ totalLocations }}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Locations</small>
+                    <div class="text-value-lg">
+                            {{ totalLocations }}
+
+                    </div>
+                    <small class="text-muted text-uppercase font-weight-bold">Managed locations</small>
                 </div>
             </div>
         </div>
@@ -72,7 +85,7 @@
                         <i class="c-icon c-icon-2xl fas fa-cubes"></i>
                     </div>
                     <div class="text-value-lg">{{ totalCategories }}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Categories</small>
+                    <small class="text-muted text-uppercase font-weight-bold">Categories count</small>
                 </div>
             </div>
         </div>
@@ -83,10 +96,54 @@
                         <i class="c-icon c-icon-2xl fas fa-users"></i>
                     </div>
                     <div class="text-value-lg">{{ totalUsers }}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Users</small>
+                    <small class="text-muted text-uppercase font-weight-bold">Users count</small>
                 </div>
             </div>
         </div>
     </div>
+
+        {% else %}
+
+            <div class="col-6">
+                <div class="card text-white bg-gradient-primary" id="location-card">
+                    <div class="card-body">
+                        <div class="text-muted text-right mb-4">
+                            <i class="c-icon c-icon-2xl fas fa-location-arrow"></i>
+                        </div>
+                        <div class="text-value-lg">
+                                {{ managedLocations }}
+                        </div>
+                        <small class="text-muted text-uppercase font-weight-bold">Managed locations</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card text-white bg-gradient-warning" id="category-card">
+                    <div class="card-body">
+                        <div class="text-muted text-right mb-4">
+                            <i class="c-icon c-icon-2xl fas fa-cubes"></i>
+                        </div>
+                        <div class="text-value-lg">{{ totalCategories }}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Categories count</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4" style="display: none">
+                <div class="card text-white bg-gradient-success" id="users-card">
+                    <div class="card-body">
+                        <div class="text-muted text-right mb-4">
+                            <i class="c-icon c-icon-2xl fas fa-users"></i>
+                        </div>
+                        <div class="text-value-lg">{{ totalUsers }}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Users count</small>
+                    </div>
+                </div>
+            </div>
+            </div>
+        {% endif %}
+
+
+
+
 </div>
 {% endblock %}

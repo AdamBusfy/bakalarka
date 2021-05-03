@@ -32,6 +32,8 @@ class ApiSelectController extends AbstractController
             }, $this->getUser()->getLocations()->toArray());
             if (!empty($usersLocationsIds)) {
                 $queryBuilder->andWhere($queryBuilder->expr()->in('l', $usersLocationsIds));
+            } else {
+                $queryBuilder->andWhere('l.isActive = -1');
             }
         }
         $locations = $queryBuilder

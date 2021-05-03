@@ -33,7 +33,7 @@ var discardedItems = document.getElementById('items_pie_chart').getAttribute('da
 var itemsPieChart = new Chart(ctx, {
     type: 'pie',
     data: {
-        labels: ['Assigned items', 'Unassigned items', 'Deleted items', 'Discarded items'],
+        labels: ['Managed items', 'Unassigned items', 'Deleted items', 'Discarded items'],
         datasets: [{
             label: '# of Votes',
             data: [assignedItems, unassignedItems, deletedItems, discardedItems],

@@ -74,6 +74,10 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
             throw new CustomUserMessageAuthenticationException('Email could not be found, please try again');
         }
 
+        if (!$user->getIsActive()) {
+            throw new CustomUserMessageAuthenticationException('User is no longer active.');
+        }
+
         return $user;
     }
 

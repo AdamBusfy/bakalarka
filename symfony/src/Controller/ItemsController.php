@@ -103,7 +103,7 @@ class ItemsController extends AbstractController
 
                 $this->getDoctrine()->getManager()->flush();
 
-                $this->addFlash('success', 'Item successfully discard!');
+                $this->addFlash('success', 'Item successfully discarded!');
                 return $this->redirect($request->getUri());
             }
         }
@@ -733,8 +733,15 @@ class ItemsController extends AbstractController
      */
     public function exportData(Request $request): Response
     {
-        $results = $categoryRepository = $this->getDoctrine()
-            ->getRepository(Item::class)->findAll();
+        $itemRepository = $this->getDoctrine()
+            ->getRepository(Item::class);
+//        $results = $categoryRepository = $this->getDoctrine()
+//            ->getRepository(Item::class)->findAll();
+        $results = $itemRepository  ->createQueryBuilder('i')
+            ->where('i.state = 1 ')
+            ->getQuery()
+            ->getResult();
+
 
         $response = new StreamedResponse();
         $response->setCallback(

@@ -22,7 +22,7 @@ class HomePageController extends AbstractController
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function index(Request $request) : Response
+    public function index(Request $request): Response
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -80,6 +80,42 @@ class HomePageController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        $managedLocations = $repoLocations->createQueryBuilder('l')
+            ->where('l.isActive = 1')
+            ->join('l.users', 'lu')
+            ->andWhere('lu.id = :uid')
+            ->setParameter('uid', '4')
+            ->select('count(l.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+
+        ///
+
+        $usersLocations = $this->getUser()->getLocations()->toArray();
+
+        $usersLocationsIds = array_map(function (Location $location) {
+            return $location->getId();
+        }, $usersLocations);
+
+        $isAdmin = in_array('ROLE_ADMIN', $this->getUser()->getRoles());
+
+        $totalItemsQB = $repoItems->createQueryBuilder('i')
+            ->andWhere('i.location IS NOT NULL')
+            ->andWhere('i.state = 1 ');
+
+        if (!$isAdmin) {
+            if (!empty($usersLocationsIds)) {
+                $totalItemsQB->andWhere($totalItemsQB->expr()->in('i.location', $usersLocationsIds));
+            } else {
+                $totalItemsQB->andWhere('1 = 2');
+            }
+        }
+
+        $managedItems = $totalItemsQB->select('count(i.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
 
         return $this->render('page/homepage.html.twig', [
             'assignedItems' => $assignedItems,
@@ -89,7 +125,9 @@ class HomePageController extends AbstractController
             'totalItems' => $totalItems,
             'totalLocations' => $totalLocations,
             'totalCategories' => $totalCategories,
-            'totalUsers' => $totalUsers
+            'totalUsers' => $totalUsers,
+            'managedLocations' => $managedLocations,
+            'managedItems' => $managedItems
         ]);
     }
 }
