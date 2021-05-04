@@ -28,5 +28,5 @@ DATABASE_URL=mysql://app_user:helloworld@db:3306/app_db?serverVersion=5.7
 
 
 
-If you want to give user an admin role use Sequel Ace or different database management application to change his role from ["ROLE_USER"] to `["ROLE_ADMIN"]`
+If you want to give user an admin role use Sequel Ace or different database management application to change his role from `["ROLE_USER"]` to `["ROLE_ADMIN"]`
 
